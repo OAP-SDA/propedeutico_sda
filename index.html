@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taller Propedéutico SDA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap">
+<style>
+  :root{
+    --verde:#1a360d; --verde-2:#24470f; --verde-claro:#2f5a1a;
+    --oliva:#3a4520; --dorado:#c1a14e; --dorado-suave:#d8c48a;
+    --crema:#fafbf6; --crema-2:#f1f2e8; --tinta:#22301a;
+    --gris:#6b7263; --blanco:#ffffff;
+    --serif:'EB Garamond',Garamond,'Apple Garamond','Times New Roman',serif;
+    --sans:-apple-system,'Segoe UI',Calibri,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--serif);background:var(--crema);color:var(--tinta);font-size:17px;line-height:1.55}
+
+  /* ---------- layout ---------- */
+  .app{display:flex;min-height:100vh}
+  aside{width:280px;background:var(--verde);color:var(--crema);position:fixed;top:0;bottom:0;left:0;
+        display:flex;flex-direction:column;z-index:10;overflow-y:auto}
+  main{margin-left:280px;flex:1;min-width:0}
+  .menu-movil{display:none;position:fixed;top:14px;right:14px;z-index:30;background:var(--verde);color:var(--dorado-suave);
+        border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:9px 14px;font-family:var(--sans);font-size:14px;
+        cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+  @media(max-width:900px){
+    aside{display:none}
+    main{margin-left:0}
+    .menu-movil{display:block}
+    body.nav-abierta aside{display:flex;width:min(300px,85vw);box-shadow:4px 0 24px rgba(0,0,0,.45)}
+  }
+
+  .brand{padding:28px 24px 18px;border-bottom:1px solid rgba(255,255,255,.14)}
+  .brand h1{font-size:19px;font-weight:600;letter-spacing:.22em;line-height:1.5}
+  .brand small{display:block;letter-spacing:.5em;font-size:11px;color:var(--dorado-suave);margin-top:2px}
+  .brand .taller{margin-top:14px;font-family:var(--sans);font-size:11px;letter-spacing:.18em;
+        text-transform:uppercase;color:var(--dorado)}
+
+  nav{flex:1;padding:12px 0}
+  .nav-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:none;
+        color:rgba(255,255,255,.82);font-family:var(--serif);font-size:15.5px;padding:11px 22px;cursor:pointer;
+        border-left:3px solid transparent;transition:.15s}
+  .nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+  .nav-item.active{background:rgba(255,255,255,.1);border-left-color:var(--dorado);color:#fff}
+  .nav-num{font-family:var(--sans);font-size:11px;width:22px;height:22px;flex:0 0 22px;border:1px solid rgba(255,255,255,.35);
+        border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--dorado-suave)}
+  .nav-item.visitado .nav-num{background:var(--dorado);border-color:var(--dorado);color:var(--verde);font-weight:700}
+  .progreso{padding:16px 24px 24px;border-top:1px solid rgba(255,255,255,.14);font-family:var(--sans);font-size:12px}
+  .barra{height:6px;background:rgba(255,255,255,.15);border-radius:3px;margin-top:8px;overflow:hidden}
+  .barra div{height:100%;width:0;background:var(--dorado);border-radius:3px;transition:width .4s}
+
+  /* ---------- secciones ---------- */
+  section.mod{display:none;padding:0 0 80px}
+  section.mod.visible{display:block}
+  .hero{background:var(--verde);color:var(--crema);padding:64px 56px 56px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-60px;bottom:-120px;width:340px;height:340px;
+        border:1.5px solid rgba(255,255,255,.25);transform:rotate(45deg)}
+  .hero::before{content:"";position:absolute;right:-20px;bottom:-160px;width:340px;height:340px;
+        border:1.5px solid rgba(255,255,255,.18);transform:rotate(45deg)}
+  .hero .kicker{font-family:var(--sans);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--dorado);margin-bottom:14px}
+  .hero h2{font-size:42px;font-weight:600;line-height:1.15;max-width:760px}
+  .hero p.sub{margin-top:14px;font-size:19px;color:rgba(255,255,255,.85);max-width:680px}
+  .contenido{padding:44px 56px;max-width:1080px}
+  @media(max-width:700px){.hero{padding:44px 24px}.contenido{padding:32px 20px}.hero h2{font-size:30px}}
+
+  h3.bloque{font-size:26px;font-weight:600;color:var(--verde);margin:38px 0 14px}
+  h3.bloque:first-child{margin-top:0}
+  .lead{font-size:18px;max-width:820px}
+  p+p{margin-top:10px}
+
+  /* ---------- componentes ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:18px}
+  .card{background:var(--blanco);border:1px solid #e3e5d8;border-radius:10px;padding:22px;box-shadow:0 1px 3px rgba(26,54,13,.06)}
+  .card h4{font-size:19px;color:var(--verde);margin-bottom:8px}
+  .card.oscuro{background:var(--verde);color:var(--crema);border-color:var(--verde)}
+  .card.oscuro h4{color:var(--dorado-suave)}
+  .icono{width:40px;height:40px;border-radius:50%;background:var(--crema-2);display:flex;align-items:center;
+        justify-content:center;margin-bottom:12px;font-size:19px}
+  .card.oscuro .icono{background:rgba(255,255,255,.12)}
+
+  details.acordeon{background:var(--blanco);border:1px solid #e3e5d8;border-radius:10px;margin-top:12px;overflow:hidden}
+  details.acordeon summary{cursor:pointer;padding:16px 20px;font-size:18px;color:var(--verde);font-weight:600;
+        list-style:none;display:flex;align-items:center;gap:12px}
+  details.acordeon summary::-webkit-details-marker{display:none}
+  details.acordeon summary::after{content:"+";margin-left:auto;font-family:var(--sans);color:var(--dorado);font-size:20px;transition:.2s}
+  details.acordeon[open] summary::after{transform:rotate(45deg)}
+  details.acordeon .cuerpo{padding:0 20px 18px;border-top:1px dashed #e3e5d8;padding-top:14px}
+
+  ul.lista{margin:10px 0 0 2px;list-style:none}
+  ul.lista li{padding:6px 0 6px 26px;position:relative}
+  ul.lista li::before{content:"";position:absolute;left:4px;top:14px;width:8px;height:8px;background:var(--dorado);
+        transform:rotate(45deg)}
+
+  .pasos{counter-reset:paso;margin-top:18px}
+  .paso{display:flex;gap:18px;padding:16px 0;border-bottom:1px dashed #dfe1d3}
+  .paso:last-child{border-bottom:none}
+  .paso .n{counter-increment:paso;flex:0 0 40px;width:40px;height:40px;border-radius:50%;background:var(--verde);
+        color:var(--dorado-suave);display:flex;align-items:center;justify-content:center;font-family:var(--sans);
+        font-weight:700;font-size:15px}
+  .paso .n::before{content:counter(paso)}
+  .paso h4{font-size:18px;color:var(--verde);margin-bottom:4px}
+
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+  .tab-btn{font-family:var(--serif);font-size:16px;padding:9px 20px;border:1.5px solid var(--verde);border-radius:999px;
+        background:transparent;color:var(--verde);cursor:pointer;transition:.15s}
+  .tab-btn.active{background:var(--verde);color:var(--crema)}
+  .tab-panel{display:none;margin-top:18px}
+  .tab-panel.visible{display:block}
+
+  .tabla{width:100%;border-collapse:collapse;margin-top:16px;background:var(--blanco);border-radius:10px;overflow:hidden;
+        box-shadow:0 1px 3px rgba(26,54,13,.06)}
+  .tabla th{background:var(--verde);color:var(--crema);text-align:left;padding:12px 16px;font-weight:600}
+  .tabla td{padding:12px 16px;border-bottom:1px solid #edeee3;vertical-align:top}
+  .tabla tr:last-child td{border-bottom:none}
+  @media(max-width:600px){.tabla th,.tabla td{padding:9px 8px;font-size:14.5px;overflow-wrap:anywhere;hyphens:auto}}
+
+  .nota{background:var(--crema-2);border-left:4px solid var(--dorado);padding:14px 18px;border-radius:0 8px 8px 0;margin-top:18px}
+  .nota strong{color:var(--verde)}
+
+  .check-lista{margin-top:14px}
+  .check{display:flex;align-items:flex-start;gap:12px;background:var(--blanco);border:1px solid #e3e5d8;border-radius:8px;
+        padding:12px 16px;margin-top:8px;cursor:pointer;transition:.15s;user-select:none}
+  .check:hover{border-color:var(--dorado)}
+  .check .caja{flex:0 0 22px;width:22px;height:22px;border:2px solid var(--verde);border-radius:5px;margin-top:1px;
+        display:flex;align-items:center;justify-content:center;color:transparent;font-size:14px;font-family:var(--sans);font-weight:700}
+  .check.marcado{background:#f4f7ee;border-color:var(--verde-claro)}
+  .check.marcado .caja{background:var(--verde);color:var(--dorado-suave)}
+  .contador-check{font-family:var(--sans);font-size:13px;color:var(--gris);margin-top:10px}
+
+  .doc-preview{background:var(--blanco);border:1px solid #d9dbcc;box-shadow:0 4px 14px rgba(26,54,13,.1);
+        padding:34px 40px;max-width:560px;margin-top:18px;font-family:'EB Garamond',Garamond,serif;font-size:15px;
+        line-height:1.5;text-align:justify}
+  .doc-preview .rubro{text-align:right;font-weight:700;font-size:13px;margin-bottom:14px}
+  .doc-preview .etiqueta{font-family:var(--sans);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin-bottom:12px;text-align:left}
+  .doc-preview .sangria{text-indent:2.2em}
+  .doc-preview .cita{font-size:12px;line-height:1.25;margin:10px 2.2em;text-align:justify;color:#444}
+
+  .gen{background:var(--verde);color:var(--crema);border-radius:12px;padding:26px;margin-top:18px}
+  .gen h4{color:var(--dorado-suave);font-size:19px;margin-bottom:14px}
+  .gen .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+  .gen label{font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);display:block;margin-bottom:4px}
+  .gen input,.gen select{width:100%;padding:9px 10px;border-radius:6px;border:none;font-family:var(--sans);font-size:14px;background:var(--crema);color:var(--tinta)}
+  .gen .salida{margin-top:18px;background:rgba(255,255,255,.1);border:1px dashed rgba(255,255,255,.4);border-radius:8px;
+        padding:14px 18px;font-family:'Courier New',monospace;font-size:16px;color:var(--dorado-suave);word-break:break-all}
+  .gen .expl{font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.65);margin-top:8px}
+
+  .toggle-dos{display:flex;gap:0;margin-top:18px;border:1.5px solid var(--verde);border-radius:999px;overflow:hidden;width:fit-content}
+  .toggle-dos button{font-family:var(--serif);font-size:16px;padding:9px 24px;border:none;background:transparent;color:var(--verde);cursor:pointer}
+  .toggle-dos button.active{background:var(--verde);color:var(--crema)}
+
+  .quiz-q{background:var(--blanco);border:1px solid #e3e5d8;border-radius:12px;padding:24px;margin-top:18px}
+  .quiz-q h4{font-size:18px;color:var(--verde);margin-bottom:12px}
+  .quiz-q .ops button{display:block;width:100%;text-align:left;font-family:var(--serif);font-size:16px;background:var(--crema);
+        border:1px solid #dfe1d3;border-radius:8px;padding:11px 16px;margin-top:8px;cursor:pointer;transition:.15s;color:var(--tinta)}
+  .quiz-q .ops button:hover:not(:disabled){border-color:var(--dorado)}
+  .quiz-q .ops button.ok{background:#eef5e6;border-color:#4c7a2e;color:#2c4d17;font-weight:600}
+  .quiz-q .ops button.mal{background:#faeeea;border-color:#b5563a;color:#8a3a24}
+  .quiz-q .fb{display:none;margin-top:12px;font-size:15px;padding:10px 14px;border-radius:8px}
+  .quiz-q .fb.visible{display:block}
+  .quiz-q .fb.bien{background:#eef5e6;color:#2c4d17}
+  .quiz-q .fb.err{background:#faeeea;color:#8a3a24}
+  .quiz-score{background:var(--verde);color:var(--crema);border-radius:12px;padding:28px;margin-top:24px;text-align:center;display:none}
+  .quiz-score.visible{display:block}
+  .quiz-score .num{font-size:54px;color:var(--dorado);font-weight:700}
+
+  .pie-nav{display:flex;justify-content:space-between;gap:12px;padding:28px 56px 60px;max-width:1080px}
+  .pie-nav button{font-family:var(--serif);font-size:17px;padding:12px 26px;border-radius:8px;cursor:pointer;border:1.5px solid var(--verde);
+        background:transparent;color:var(--verde);transition:.15s}
+  .pie-nav button.primario{background:var(--verde);color:var(--crema)}
+  .pie-nav button:hover{transform:translateY(-1px)}
+  .pie-nav button:disabled{opacity:.35;cursor:default;transform:none}
+  @media(max-width:700px){.pie-nav{padding:20px}}
+
+  .org{margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:0}
+  .org .fila{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  .org .nodo,.org3 .nodo{background:var(--blanco);border:1.5px solid var(--verde);border-radius:9px;padding:10px 18px;font-size:15.5px;
+        color:var(--verde);cursor:pointer;transition:.15s;text-align:center}
+  .org .nodo:hover,.org3 .nodo:hover{background:var(--verde);color:var(--crema)}
+  .org .nodo.sel,.org3 .nodo.sel{background:var(--verde);color:var(--crema);box-shadow:0 3px 10px rgba(26,54,13,.3)}
+  .org .linea{width:2px;height:18px;background:var(--verde-claro);opacity:.5}
+  .org3{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:0;row-gap:0;margin-top:20px;max-width:820px}
+  .org3 .c1{grid-column:1;justify-self:end}.org3 .c2{grid-column:2;justify-self:center}.org3 .c3{grid-column:3;justify-self:start}
+  .org3 .vl{width:2px;height:22px;background:var(--verde-claro);opacity:.5}
+  .org3 .hl{height:2px;background:var(--verde-claro);opacity:.5;align-self:center;width:100%}
+  .org3 .lado{display:flex;align-items:center}
+  .org3 .lado.izq{justify-self:stretch;justify-content:flex-end}.org3 .lado.der{justify-self:stretch;justify-content:flex-start}
+  .org3 .lado .hl{flex:1;min-width:16px}
+  .org3 .centro{display:flex;align-items:center;justify-self:stretch;align-self:stretch}.org3 .centro .esp,.org3 .centro .hl{flex:1}
+  @media(max-width:700px){.org3 .nodo{padding:8px 10px;font-size:14px}}
+  .semaforo{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}
+  .semaforo span{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:13px}
+  .semaforo i{width:16px;height:16px;border-radius:50%;display:inline-block}
+  .pendiente{border:2px dashed #b9892f;background:#fdf8ea;border-radius:10px;padding:14px 18px;margin-top:14px}
+  .pendiente p{font-size:15.5px;color:#5b4a1f}
+  .chip-pend{display:inline-block;font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+        background:#b9892f;color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;margin-bottom:8px}
+  body.ocultar-pendientes .pendiente{display:none}
+  .aviso-editor{background:#fdf8ea;border:1px solid #e3c98a;border-radius:10px;padding:12px 18px;margin-bottom:22px;font-family:var(--sans);font-size:13px;color:#5b4a1f}
+  body.ocultar-pendientes .aviso-editor{display:none}
+  .esencial{background:var(--verde);color:var(--crema);border-radius:12px;padding:20px 24px;margin-bottom:30px}
+  .esencial h4{color:var(--dorado-suave);font-size:18px;margin-bottom:4px}
+  .esencial ul.lista li::before{background:var(--dorado)}
+  .ir-mod{font-family:var(--sans);font-size:12px;border:1px solid var(--verde);background:transparent;color:var(--verde);
+        border-radius:999px;padding:3px 12px;cursor:pointer;margin-top:6px}
+  .ir-mod:hover{background:var(--verde);color:var(--crema)}
+  .glosario-buscar{width:100%;max-width:420px;padding:10px 14px;border:1.5px solid var(--verde);border-radius:8px;font-family:var(--serif);font-size:16px;margin-top:14px;background:var(--blanco)}
+  .glosario{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:14px}
+  .glosario .termino{background:var(--blanco);border:1px solid #e3e5d8;border-radius:10px;padding:14px 18px}
+  .glosario .termino h4{color:var(--verde);font-size:17px}
+  .glosario .termino small{display:block;font-family:var(--sans);font-size:11px;color:var(--gris);margin-top:6px}
+  .glosario .termino.pend{border:2px dashed #b9892f;background:#fdf8ea}
+  .quiz-comentario textarea{width:100%;min-height:90px;border-radius:8px;border:none;padding:10px 12px;font-family:var(--serif);font-size:16px;margin-top:8px}
+  .org-info{margin-top:16px;background:var(--crema-2);border-radius:10px;padding:18px 22px;min-height:64px;max-width:760px}
+  .org-info strong{color:var(--verde)}
+
+  .chip{display:inline-block;font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+        background:var(--dorado);color:var(--verde);border-radius:999px;padding:3px 12px;font-weight:700;margin-bottom:10px}
+  .dos-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  @media(max-width:760px){.dos-col{grid-template-columns:1fr}}
+  .footer-firma{font-family:var(--sans);font-size:11px;letter-spacing:.2em;color:var(--gris);text-transform:uppercase;
+        text-align:center;padding:0 20px 40px}
+</style>
+</head>
+<body>
+<button class="menu-movil" id="btn-menu" onclick="document.body.classList.toggle('nav-abierta')">☰ Módulos</button>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <h1>SCHÜTTE &amp; DELSOL</h1>
+      <small>A B O G A D O S</small>
+      <div class="taller">Taller propedéutico</div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="progreso">
+      <span id="prog-txt">0 de 11 secciones visitadas</span>
+      <div class="barra"><div id="prog-bar" style="width: 0%;"></div></div>
+    </div>
+  </aside>
+  <main id="main">
+
+<!-- ============ INICIO ============ -->
+<section class="mod visible" id="sec-inicio">
+  <div class="hero">
+    <div class="kicker">Programa de inducción · Schütte &amp; Delsol Abogados</div>
+    <h2>Taller propedéutico</h2>
+    <p class="sub">¡Bienvenidos a SDA! Este recorrido interactivo reúne todo lo que necesitas para integrarte al despacho: quiénes somos, cómo trabajamos, cómo redactamos y qué herramientas usamos todos los días.</p>
+  </div>
+  <div class="contenido">
+    <div class="aviso-editor" id="aviso-editor"></div>
+    <h3 class="bloque">Cómo usar este taller</h3>
+    <div class="cards">
+      <div class="card"><div class="icono">🧭</div><h4>Navega por módulos</h4><p>Una sección de primeros días y ocho módulos en el menú lateral, en el mismo orden del propedéutico presencial. Puedes avanzar con los botones o saltar a cualquier sección.</p></div>
+      <div class="card"><div class="icono">🖱️</div><h4>Interactúa</h4><p>Haz clic en organigramas, flujos, listas de verificación y comparadores. Practica la nomenclatura de archivos con el generador del módulo 4.</p></div>
+      <div class="card"><div class="icono">✅</div><h4>Autoevalúate</h4><p>Al final hay un cuestionario de repaso con retroalimentación inmediata. Úsalo para confirmar que dominas las reglas esenciales del despacho.</p></div>
+    </div>
+    <div class="nota"><strong>Nota:</strong> este material complementa —no sustituye— la presentación oficial del propedéutico y los documentos internos del despacho (Proceso de Revisión Documental, plantillas y formato editorial).</div>
+    <h3 class="bloque">Contenido</h3>
+    <div class="pasos" id="indice-inicio"></div>
+  </div>
+  <div class="pie-nav">
+    <button disabled>← Inicio</button>
+    <button class="primario" onclick="irA(1)">Primeros días →</button>
+  </div>
+</section>
+
+
+<!-- ============ PRIMEROS DÍAS ============ -->
+<section class="mod" id="sec-primeros">
+  <div class="hero">
+    <div class="kicker">Antes de empezar</div>
+    <h2>Primeros días: cómo funciona el despacho por dentro</h2>
+    <p class="sub">Qué canal se usa para qué, a quién acudir, el recorrido de un asunto de principio a fin y los términos internos que vas a escuchar.</p>
+  </div>
+  <div class="contenido">
+    <h3 class="bloque">Canales de comunicación</h3>
+    <p class="lead">Esto es lo que dicen los módulos sobre cada canal:</p>
+    <table class="tabla">
+      <tbody>
+      <tr><th style="width:22%">Canal</th><th>Para qué sirve, según el propedéutico</th><th style="width:16%">Dónde se ve</th></tr>
+      <tr><td><strong>Teamwork</strong></td><td>Plataforma central de proyectos y trabajo. Dentro de cada proyecto: <i>Mensajes</i> (comunicación interna del proyecto) y <i>Comentarios</i> (conversación ligada a cada tarea).</td><td><button class="ir-mod" onclick="irAId('m8')">Módulo 8</button></td></tr>
+      <tr><td><strong>Chat</strong></td><td>Canal interno para instrucciones y entregas del asunto.</td><td><button class="ir-mod" onclick="irAId('m5')">Módulo 5</button></td></tr>
+      <tr><td><strong>Grupos de cada asunto</strong></td><td>Destino de los informes del asunto, «de forma clara y ejecutiva». Por ahí también se envían los acuerdos de amparo que revisa el pasante.</td><td><button class="ir-mod" onclick="irAId('m3')">Módulos 3 y 6</button></td></tr>
+      <tr><td><strong>WhatsApp</strong></td><td>Mensajería rápida con clientes y equipo.</td><td><button class="ir-mod" onclick="irAId('m8')">Módulo 8</button></td></tr>
+      <tr><td><strong>Outlook</strong></td><td>Correo electrónico profesional del despacho.</td><td><button class="ir-mod" onclick="irAId('m8')">Módulo 8</button></td></tr>
+      <tr><td><strong>Calendar</strong></td><td>Agenda y citas del despacho.</td><td><button class="ir-mod" onclick="irAId('m8')">Módulo 8</button></td></tr>
+      <tr><td><strong>Claude</strong></td><td>Asistente de IA para redacción y análisis; la ortografía y redacción «podrá auxiliarse de la IA».</td><td><button class="ir-mod" onclick="irAId('m8')">Módulos 4 y 8</button></td></tr>
+      </tbody>
+    </table>
+    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p>La regla de uso: qué va por cada canal (instrucciones, entregas, avisos a clientes, documentos, agenda) y cuál manda cuando dos se cruzan, por ejemplo, Chat frente a Mensajes de Teamwork, o WhatsApp frente a Outlook con clientes.</p></div>
+
+    <h3 class="bloque">¿Con quién voy para…?</h3>
+    <table class="tabla">
+      <tbody>
+      <tr><th>Tema</th><th>A quién acudir</th><th>De dónde sale</th></tr>
+      <tr><td>Dudas sobre un asunto que te asignaron</td><td><strong>Tu abogado asignado</strong></td><td>«Abogados guían pasantes» (módulo 1) y cierre del taller.</td></tr>
+      <tr><td>Dudas generales o no sabes con quién ir</td><td><strong>El Coordinador del despacho</strong></td><td>Cierre del taller.</td></tr>
+      <tr><td>Apertura del expediente físico de un asunto</td><td><strong>Área de administración</strong></td><td>Flujo de la denuncia al expediente (módulo 6).</td></tr>
+      <tr><td>Llamadas, visitas, correspondencia y mantenimiento</td><td><strong>Personal administrativo</strong></td><td>Organigrama (módulo 1).</td></tr>
+      <tr><td>Proyectos del despacho y planeación anual</td><td><strong>Oficina de Administración de Proyectos (OAP)</strong></td><td>Módulos 1 y 7.</td></tr>
+      <tr><td>Quién redacta y revisa un documento</td><td><strong>Coordinador (proceso A) o abogado a cargo (procesos B y C)</strong></td><td>Proceso de revisión documental (módulo 5).</td></tr>
+      </tbody>
+    </table>
+    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p>Completar y confirmar la tabla: permisos y días de home office, nómina y evaluaciones, acceso a Teamwork y demás plataformas, material de oficina, y a quién avisar ante una urgencia fuera del horario.</p></div>
+
+    <h3 class="bloque">El recorrido de un asunto, de principio a fin</h3>
+    <p class="lead">Cada paso ya está en algún módulo; aquí aparecen en orden para que veas cómo se conectan. Usa los botones para ir al detalle.</p>
+    <div class="pasos">
+      <div class="paso"><div class="n"></div><div><h4>Recibes la instrucción</h4><p>Toma notas de cada instrucción; en los procesos B y C, el redactor confirma las instrucciones (por escrito en el B).</p><button class="ir-mod" onclick="irAId('m3')">Ver módulos 3 y 5</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>La tarea queda en Teamwork</h4><p>Cada tarea con responsable, fecha de vencimiento, estado y avance.</p><button class="ir-mod" onclick="irAId('m8')">Ver módulo 8</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Revisas el expediente y la agenda</h4><p>Revisión exhaustiva del expediente; registro obligatorio de plazos, audiencias y vencimientos.</p><button class="ir-mod" onclick="irAId('m3')">Ver módulo 3</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Redactas con el formato del despacho</h4><p>Garamond 12, interlineado 1.5, justificado; reglas de negritas, cursivas y subrayado.</p><button class="ir-mod" onclick="irAId('m4')">Ver módulo 4</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Pasa por el proceso de revisión que le toca</h4><p>La clasificación del asunto determina si es proceso A, B o C.</p><button class="ir-mod" onclick="irAId('m5')">Ver módulo 5</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Nombras y envías el documento</h4><p>Siempre en Word y PDF, con el nombre: iniciales, expediente, tipo, fecha y versión.</p><button class="ir-mod" onclick="irAId('m4')">Ver módulo 4</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Presentas y obtienes la constancia</h4><p>Toda actuación ante el Ministerio Público genera una constancia: fotografía, escaneo, PDF y nombre.</p><button class="ir-mod" onclick="irAId('m6')">Ver módulo 6</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Integras el mismo día y registras en bitácora</h4><p>Al expediente interno; si hay copias nuevas de la carpeta, al expediente de copia íntegra.</p><button class="ir-mod" onclick="irAId('m6')">Ver módulo 6</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Registras tus horas</h4><p>Hoja de horas de Teamwork: facturable o no facturable por registro.</p><button class="ir-mod" onclick="irAId('m8')">Ver módulo 8</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Reportas avances</h4><p>Informes a los grupos de cada asunto, de forma clara y ejecutiva.</p><button class="ir-mod" onclick="irAId('m3')">Ver módulo 3</button></div></div>
+    </div>
+    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p>Validar este recorrido. Se armó uniendo los módulos; confirmar el orden y añadir lo que falte (por ejemplo, en qué momento se informa al cliente y quién lo hace).</p></div>
+
+    <h3 class="bloque">Glosario interno</h3>
+    <p class="lead">Términos y siglas que aparecen en el propedéutico. Escribe para filtrar:</p>
+    <input class="glosario-buscar" id="glosario-buscar" placeholder="Buscar un término…">
+    <div class="glosario" id="glosario">
+      <div class="termino"><h4>OAP</h4><p>Oficina de Administración de Proyectos: planeación anual, seguimiento y mejora continua, desarrollo profesional y resultados.</p><small>Módulo 1</small></div>
+      <div class="termino"><h4>Coordinador</h4><p>El Coordinador del despacho: diseña planes, programas y proyectos anuales, designa responsables de proyectos y da acompañamiento continuo.</p><small>Módulos 1 y 5</small></div>
+      <div class="termino"><h4>Abogado a cargo</h4><p>Define redactor, revisor y estructura de un documento en los procesos B y C.</p><small>Módulo 5</small></div>
+      <div class="termino"><h4>Redactor</h4><p>Quien hace la primera versión de un documento.</p><small>Módulo 5</small></div>
+      <div class="termino"><h4>Revisor</h4><p>Quien corrige estructura, contenido y estilo.</p><small>Módulo 5</small></div>
+      <div class="termino"><h4>Chat</h4><p>Canal interno para instrucciones y entregas del asunto.</p><small>Módulo 5</small></div>
+      <div class="termino"><h4>Proceso A, B y C</h4><p>Procesos de revisión documental: máxima, intermedia y mínima supervisión.</p><small>Módulo 5</small></div>
+      <div class="termino"><h4>Revisión editorial</h4><p>Corrección lingüística final, revisión de formato, entrega de versión tentativamente final y generación de compare entre versiones.</p><small>Módulo 5</small></div>
+      <div class="termino pend"><h4>Compare</h4><p>Se genera «entre versiones» en la revisión editorial y sirve para evaluar la calidad y cantidad de cambios. Falta una definición formal.</p><small>Módulo 5 · <b>pendiente de definir</b></small></div>
+      <div class="termino"><h4>Tipo A, B y C de proyecto</h4><p>Clasificación de los proyectos del despacho (coordinar, supervisar, monitorear). No confundir con los procesos A, B y C de revisión.</p><small>Módulo 7</small></div>
+      <div class="termino"><h4>Desarrollo de Proyectos</h4><p>Documento estático con el portafolio permanente de proyectos del despacho.</p><small>Módulo 7</small></div>
+      <div class="termino"><h4>Expediente interno</h4><p>Expediente que construye el despacho para dar seguimiento al asunto: documentos propios y constancias de nuestras gestiones.</p><small>Módulo 6</small></div>
+      <div class="termino"><h4>Expediente de copia íntegra</h4><p>Copia exacta, completa e íntegra de la carpeta de investigación.</p><small>Módulo 6</small></div>
+      <div class="termino"><h4>Constancia</h4><p>Lo que genera toda actuación ante el Ministerio Público (regla de oro).</p><small>Módulo 6</small></div>
+      <div class="termino pend"><h4>Bitácoras</h4><p>Las presentaciones mencionan la bitácora de seguimiento, la del asunto, la mensual y la interna de amparo. Falta aclarar si son la misma y dónde se lleva cada una.</p><small>Módulo 6 · <b>pendiente de definir</b></small></div>
+      <div class="termino"><h4>Índice</h4><p>Guía de los documentos más importantes de la carpeta; se actualiza con cada nuevo documento.</p><small>Módulo 6</small></div>
+      <div class="termino"><h4>MP</h4><p>Ministerio Público.</p><small>Módulos 3 y 6</small></div>
+      <div class="termino"><h4>FGR / FGJCDMX</h4><p>Fiscalía General de la República / Fiscalía General de Justicia de la Ciudad de México.</p><small>Módulo 6</small></div>
+      <div class="termino"><h4>CNPP</h4><p>Código Nacional de Procedimientos Penales.</p><small>Módulos 4 y 6</small></div>
+      <div class="termino"><h4>MASC</h4><p>Mecanismos alternativos de solución de controversias.</p><small>Módulo 6</small></div>
+      <div class="termino pend"><h4>UGA</h4><p>Unidad de Gestión de Audiencias, según la presentación; ahí se solicita el registro de las audiencias. Falta confirmar el nombre oficial.</p><small>Módulo 6 · <b>pendiente de definir</b></small></div>
+      <div class="termino"><h4>PJF / OAJ</h4><p>Poder Judicial de la Federación / Órgano de Administración Judicial: portales para dar seguimiento al amparo.</p><small>Módulo 6</small></div>
+      <div class="termino pend"><h4>NVP y FI</h4><p>Siglas de determinaciones que debe reflejar el índice de la carpeta. Falta su significado.</p><small>Módulo 6 · <b>pendiente de definir</b></small></div>
+      <div class="termino pend"><h4>Sistema de Mejoración Continua</h4><p>Su operación corresponde a la Coordinación. Falta explicar qué es y cómo funciona.</p><small>Módulo 1 · <b>pendiente de definir</b></small></div>
+      <div class="termino"><h4>Hoja de horas</h4><p>Función de Teamwork para registrar las horas dedicadas a cada tarea y proyecto.</p><small>Módulo 8</small></div>
+    </div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(0)">← Bienvenida</button>
+    <button class="primario" onclick="irA(2)">Introducción a SDA →</button>
+  </div>
+</section>
+
+<!-- ============ MÓDULO 1 ============ -->
+<section class="mod" id="sec-m1">
+  <div class="hero">
+    <div class="kicker">Módulo 1</div>
+    <h2>Introducción a Schütte &amp; Delsol Abogados</h2>
+    <p class="sub">Misión, visión, valores, estructura y cultura del despacho.</p>
+  </div>
+  <div class="contenido">
+    <div class="esencial"><h4>Lo esencial de este módulo</h4><ul class="lista"><li>Valores: pasión, rigor y compromiso con la excelencia profesional, la justicia, la paz y el humanismo.</li><li>Dirección y OAP asignan tareas, Coordinación organiza equipos y los abogados guían a los pasantes.</li><li>Jornada regular hasta las 19:00 horas, sin labores en fines de semana y con home office hasta 4 días al mes.</li></ul></div>
+
+    <div class="cards">
+      <div class="card oscuro"><div class="icono">🎯</div><h4>Misión</h4><p>Ponemos nuestros conocimientos, habilidades y experiencia al servicio de nuestros clientes con el propósito de generar valor tangible en sus vidas, fortalecer sus negocios y acompañarlos en la consecución de sus objetivos con confianza, excelencia y severa lealtad; en apego a los más altos estándares de integridad, innovación y rigor.</p></div>
+      <div class="card oscuro"><div class="icono">🔭</div><h4>Visión</h4><p>En 10 años, Schütte &amp; Delsol Abogados será el referente de despacho penalista mexicano que no sólo gestiona exitosamente los casos más complejos, de alto impacto, y alineados con causas justas sino que, además, trasciende el ejercicio profesional de la abogacía para transformar la realidad social.</p></div>
+      <div class="card oscuro"><div class="icono">⚖️</div><h4>Valores</h4><p>Pasión, rigor y compromiso con la excelencia profesional, la justicia, la paz y el humanismo.</p></div>
+    </div>
+
+    <h3 class="bloque">Organigrama interactivo</h3>
+    <p class="lead">Haz clic en cada puesto para conocer sus funciones.</p>
+    <div class="org3" aria-label="Organigrama de Schütte &amp; Delsol Abogados">
+      <div class="c2 nodo" data-org="socio">Socio/a director/a</div>
+      <div class="c2 vl"></div>
+      <div class="c1 lado izq"><div class="nodo" data-org="oap">Oficina de Administración de Proyectos</div><div class="hl"></div></div>
+      <div class="c2 centro"><div class="hl"></div><div class="vl" style="height:auto;align-self:stretch;flex:0 0 2px"></div><div class="hl"></div></div>
+      <div class="c3 lado der"><div class="hl"></div><div class="nodo" data-org="admin">Personal de administración del despacho</div></div>
+      <div class="c2 vl"></div>
+      <div class="c2 nodo" data-org="coord">Coordinador/a del despacho</div>
+      <div class="c2 vl"></div>
+      <div class="c2 centro"><div class="esp"></div><div class="nodo" data-org="abogados">Abogada/os</div><div class="hl"></div></div>
+      <div class="c3 lado der"><div class="hl"></div><div class="nodo" data-org="ofcounsel">Of counsel</div></div>
+      <div class="c2 vl"></div>
+      <div class="c2 nodo" data-org="pasantes">Pasantes</div>
+    </div>
+    <p class="contador-check">La Oficina de Administración de Proyectos y el Personal de administración dependen del Socio/a director/a, al mismo nivel que la Coordinación.</p>
+    <div class="org-info" id="org-info">Selecciona un puesto del organigrama.</div>
+
+    <h3 class="bloque">Comunicación interna</h3>
+    <div class="pasos">
+      <div class="paso"><div class="n"></div><div><h4>Dirección y OAP asignan tareas</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Coordinación organiza equipos</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Abogados guían pasantes</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Todos colaboran y reportan</h4></div></div>
+    </div>
+
+    <h3 class="bloque">Desarrollo profesional, evaluaciones, OAP y horarios</h3>
+    <div class="dos-col">
+      <div class="card"><span class="chip">Carrera</span><h4>Escalera de desarrollo</h4>
+        <ul class="lista">
+          <li>Pasante (niveles 1 – 4).</li>
+          <li>Asociado junior (niveles 1 – 2).</li>
+          <li>Asociado senior (niveles 1 – 2).</li>
+          <li>Socios junior y senior (niveles 1 – 2).</li>
+        </ul></div>
+      <div class="card"><span class="chip">Incentivos</span><h4>Evaluaciones y bonos</h4>
+        <ul class="lista">
+          <li>Evaluaciones trimestrales.</li>
+          <li>Bono hasta 1.5 veces el salario.</li>
+          <li>Reconocimientos por desempeño excepcional.</li>
+        </ul></div>
+      <div class="card"><span class="chip">OAP</span><h4>Oficina de Administración de Proyectos</h4>
+        <ul class="lista">
+          <li>Planeación anual.</li>
+          <li>Seguimiento y mejora continua.</li>
+          <li>Desarrollo profesional.</li>
+          <li>Resultados.</li>
+        </ul></div>
+      <div class="card"><span class="chip">Bienestar</span><h4>Horarios y bienestar</h4>
+        <ul class="lista">
+          <li>Jornada regular hasta las 19:00 horas.</li>
+          <li>Sin labores en fines de semana.</li>
+          <li>Home office hasta 4 días al mes.</li>
+          <li>Equilibrio personal y profesional.</li>
+        </ul></div>
+    </div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(1)">← Primeros días</button>
+    <button class="primario" onclick="irA(3)">¿Qué hacemos? →</button>
+  </div>
+</section>
+
+<!-- ============ MÓDULO 2 ============ -->
+<section class="mod" id="sec-m2">
+  <div class="hero">
+    <div class="kicker">Módulo 2</div>
+    <h2>¿Qué hacemos?</h2>
+    <p class="sub">Las seis áreas de práctica del despacho. Despliega cada una para conocerla.</p>
+  </div>
+  <div class="contenido">
+    <div class="esencial"><h4>Lo esencial de este módulo</h4><ul class="lista"><li>El despacho se especializa en litigio penal estratégico, en todas las etapas del proceso.</li><li>Además: cumplimiento normativo, litigio pro bono, litigio estratégico, política pública y academia.</li><li>Pro bono: representación jurídica gratuita a personas y comunidades en situación de vulnerabilidad.</li></ul></div>
+
+    <details class="acordeon" open><summary>⚖️ &nbsp;Litigio penal</summary><div class="cuerpo"><p>El despacho se especializa en litigio penal estratégico, ofreciendo representación integral en todas las etapas del proceso, desde la investigación inicial hasta los juicios orales y los medios de impugnación. Nuestro enfoque combina técnica jurídica, análisis probatorio y una defensa sólida orientada a la protección de derechos, la construcción de narrativas procesales efectivas y la obtención de resultados favorables en casos de alta complejidad.</p></div></details>
+    <details class="acordeon"><summary>🛡️ &nbsp;Cumplimiento normativo</summary><div class="cuerpo"><p>El despacho cuenta con una práctica robusta en cumplimiento normativo, orientada a identificar, prevenir y mitigar riesgos legales, operativos y reputacionales dentro de organizaciones públicas y privadas. Diseñamos e implementamos programas de integridad, protocolos internos, matrices de riesgo y mecanismos de supervisión que aseguran el apego a la legislación aplicable, estándares internacionales y mejores prácticas corporativas. Nuestro enfoque combina análisis técnico, diagnóstico organizacional y acompañamiento continuo para fortalecer la cultura de cumplimiento y garantizar entornos éticos, transparentes y sostenibles.</p></div></details>
+    <details class="acordeon"><summary>🤝 &nbsp;Litigio pro bono</summary><div class="cuerpo"><p>El despacho mantiene un firme compromiso con el litigio pro bono, brindando representación jurídica gratuita a personas y comunidades en situación de vulnerabilidad que enfrentan violaciones a sus derechos o barreras de acceso a la justicia. Nuestro trabajo se orienta a la defensa estratégica, la incidencia y la reparación integral, asumiendo casos que requieren acompañamiento técnico, sensibilidad humana y una visión ética del ejercicio profesional. A través de esta práctica, buscamos contribuir al fortalecimiento del Estado de derecho y a la construcción de entornos más justos y equitativos.</p></div></details>
+    <details class="acordeon"><summary>🎯 &nbsp;Litigio estratégico</summary><div class="cuerpo"><p>El despacho desarrolla una práctica especializada en litigio estratégico, orientada a la construcción de casos que trascienden la resolución individual del conflicto y buscan generar impactos estructurales, precedentes relevantes o transformaciones institucionales. Nuestro enfoque combina análisis jurídico profundo, diseño de rutas procesales de alto impacto, gestión probatoria avanzada y una narrativa litigiosa capaz de incidir tanto en tribunales como en la opinión pública especializada. Asumimos asuntos que requieren visión táctica, lectura política del entorno y una ejecución procesal precisa para maximizar resultados y producir cambios sostenibles.</p></div></details>
+    <details class="acordeon"><summary>🏛️ &nbsp;Política pública</summary><div class="cuerpo"><p>El despacho impulsa proyectos de política pública, ofreciendo análisis técnico, diseño de soluciones normativas y evaluación de programas gubernamentales. Nuestro trabajo se orienta a generar intervenciones viables, basadas en evidencia y alineadas con las necesidades institucionales.</p></div></details>
+    <details class="acordeon"><summary>🎓 &nbsp;Academia</summary><div class="cuerpo"><p>El despacho mantiene una participación activa en el ámbito académico, colaborando en la formación de nuevas generaciones de juristas mediante docencia, investigación y la difusión de conocimiento especializado. A través de seminarios, publicaciones y actividades universitarias, fortalecemos el diálogo entre la práctica profesional y la reflexión teórica, contribuyendo al desarrollo de una cultura jurídica crítica y de alto nivel.</p></div></details>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(2)">← Introducción a SDA</button>
+    <button class="primario" onclick="irA(4)">Mecánica de trabajo →</button>
+  </div>
+</section>
+
+<!-- ============ MÓDULO 3 ============ -->
+<section class="mod" id="sec-m3">
+  <div class="hero">
+    <div class="kicker">Módulo 3</div>
+    <h2>Mecánica de trabajo y redacción jurídica</h2>
+    <p class="sub">Expectativas, flujo de trabajo, documentos, agenda y reglas de conducta profesional.</p>
+  </div>
+  <div class="contenido">
+    <div class="esencial"><h4>Lo esencial de este módulo</h4><ul class="lista"><li>Toma notas de cada instrucción, reporta avances y propón alternativas.</li><li>Registro obligatorio de plazos, audiencias y vencimientos en la agenda.</li><li>Respeto absoluto a la confidencialidad: no envíes información a personas ajenas al asunto o al despacho.</li></ul></div>
+
+    <h3 class="bloque">Expectativas</h3>
+    <ul class="lista">
+      <li>Responsabilidad individual.</li>
+      <li>Consultar expedientes físico y electrónico.</li>
+      <li>Tomar notas de cada instrucción.</li>
+      <li>Reportar avances.</li>
+      <li>Proponer alternativas.</li>
+    </ul>
+
+    <h3 class="bloque">Flujo general de trabajo</h3>
+    <div class="pasos">
+      <div class="paso"><div class="n"></div><div><h4>Apertura de expediente interno</h4><p>Con ruta procesal clara desde el inicio.</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Identificación de diligencias urgentes</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Revisión exhaustiva del expediente</h4><p>Y estudio a profundidad del asunto.</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Agenda procesal y control de plazos</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Informes a los grupos de cada asunto</h4><p>De forma clara y ejecutiva.</p></div></div>
+    </div>
+
+    <h3 class="bloque">Tipos de documentos y plantillas internas</h3>
+    <div class="dos-col">
+      <div class="card"><h4>Tipos de documentos</h4>
+        <ul class="lista">
+          <li>Escritos para el Ministerio Público.</li>
+          <li>Promociones judiciales.</li>
+          <li>Informes internos.</li>
+          <li>Mensajes para clientes.</li>
+          <li>Notas técnicas y de análisis jurídico.</li>
+        </ul></div>
+      <div class="card"><h4>Plantillas internas</h4>
+        <ul class="lista">
+          <li>Encabezados institucionales y formato uniforme.</li>
+          <li>Datos completos de carpeta, autoridad y partes.</li>
+          <li>Redacción clara y concreta.</li>
+          <li>Anexos identificados correctamente.</li>
+        </ul></div>
+    </div>
+
+    <h3 class="bloque">Agenda y manejo de información sensible</h3>
+    <div class="dos-col">
+      <div class="card"><span class="chip">Agenda</span>
+        <ul class="lista">
+          <li>Registro obligatorio de plazos, audiencias y vencimientos.</li>
+          <li>Clasificación por nivel de urgencia.</li>
+          <li>Recordatorios.</li>
+          <li>Coordinación con los integrantes para la agenda.</li>
+        </ul></div>
+      <div class="card"><span class="chip">Información sensible</span>
+        <ul class="lista">
+          <li>Clasificación por niveles de acceso.</li>
+          <li>Uso responsable de datos personales.</li>
+          <li>Resguardo de documentos originales.</li>
+          <li>Respeto absoluto a la confidencialidad.</li>
+          <li>No enviar información a personas ajenas al asunto o al despacho.</li>
+        </ul></div>
+    </div>
+
+    <h3 class="bloque">Buenas prácticas en audiencias y reglas generales</h3>
+    <div class="dos-col">
+      <div class="card"><span class="chip">Audiencias</span>
+        <ul class="lista">
+          <li>Revisión previa de carpeta.</li>
+          <li>Lista de documentos relevantes.</li>
+          <li>Resumen de teoría del caso.</li>
+          <li>Registro posterior en minuta interna.</li>
+          <li>Comunicación inmediata al cliente y/o socio responsable.</li>
+        </ul></div>
+      <div class="card"><span class="chip">Reglas generales</span>
+        <ul class="lista">
+          <li>Presencia puntual y adecuada.</li>
+          <li>Lenguaje técnico y respetuoso.</li>
+          <li>Dominio de los asuntos asignados.</li>
+          <li>Documentación de cada actuación.</li>
+          <li>Cultura de la mejora continua.</li>
+        </ul></div>
+    </div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(3)">← ¿Qué hacemos?</button>
+    <button class="primario" onclick="irA(5)">Word y plantillas →</button>
+  </div>
+</section>
+
+<!-- ============ MÓDULO 4 ============ -->
+<section class="mod" id="sec-m4">
+  <div class="hero">
+    <div class="kicker">Módulo 4</div>
+    <h2>Trabajo en Word y plantillas básicas</h2>
+    <p class="sub">El formato editorial del despacho, con ejemplo visual y práctica de nomenclatura de archivos.</p>
+  </div>
+  <div class="contenido">
+    <div class="esencial"><h4>Lo esencial de este módulo</h4><ul class="lista"><li>Garamond 12, interlineado 1.5, párrafo justificado y márgenes de 2.5.</li><li>Nombres propios y legislación en negritas; correos y fechas en cursivas; direcciones subrayadas y sin abreviaturas.</li><li>Todo documento se envía en Word y PDF, con el nombre de archivo del despacho.</li></ul></div>
+
+    <h3 class="bloque">Formato del despacho, en vivo</h3>
+    <p class="lead">Así se ve un documento con el formato Schütte &amp; Delsol. Pasa el cursor sobre cada regla para ubicarla en la página de ejemplo.</p>
+    <div class="dos-col">
+      <div>
+        <div class="check-lista" id="reglas-formato">
+          <div class="check" data-hl="fuente"><div class="caja">✓</div><div><strong>Fuente Garamond, tamaño 12</strong> · interlineado 1.5.</div></div>
+          <div class="check" data-hl="just"><div class="caja">✓</div><div><strong>Párrafo justificado</strong> · a 12 puntos cada párrafo y 18 puntos por títulos.</div></div>
+          <div class="check" data-hl="sangria"><div class="caja">✓</div><div><strong>Sangría de primera línea</strong> en párrafos consecutivos · márgenes de 2.5.</div></div>
+          <div class="check" data-hl="cita"><div class="caja">✓</div><div><strong>Citas en tamaño 10</strong>, sin interlineado, sangradas de ambos lados con 2 cm.</div></div>
+          <div class="check" data-hl="negritas"><div class="caja">✓</div><div><strong>Nombres propios en negritas</strong> (menos autoridades) · legislación en negritas.</div></div>
+          <div class="check" data-hl="cursivas"><div class="caja">✓</div><div><strong>Correos y fechas en cursivas</strong> · citas textuales cortas en cursivas; las largas, en párrafo aparte.</div></div>
+          <div class="check" data-hl="subr"><div class="caja">✓</div><div><strong>Direcciones subrayadas</strong> y sin abreviaturas.</div></div>
+          <div class="check"><div class="caja">✓</div><div><strong>Evitar la voz pasiva y el gerundio.</strong></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="doc-preview" id="doc-preview">
+          <div class="etiqueta">Ejemplo · documento para autoridad (sin membrete)</div>
+          <div class="rubro">ESCRITO DE DESIGNACIÓN DE DOMICILIO.</div>
+          <p class="hl-fuente"><span class="hl-negritas"><b>Ricardo Enrique Uribe González</b></span>, por mi propio derecho, señalo como domicilio para oír y recibir notificaciones el ubicado en <span class="hl-subr"><u>calle Tenancingo, número 36, colonia Condesa, demarcación territorial Cuauhtémoc, código postal 06140, Ciudad de México</u></span>, y como correo electrónico <span class="hl-cursivas"><i>correo@ejemplo.mx</i></span>, con fundamento en el <b>Código Nacional de Procedimientos Penales</b>.</p>
+          <p class="sangria hl-sangria">Este segundo párrafo lleva sangría de primera línea, se redacta <span class="hl-just">justificado</span> y sin voz pasiva ni gerundios. Ciudad de México, a <span class="hl-cursivas"><i>11 de mayo de 2025</i></span>.</p>
+          <p class="cita hl-cita">"Las citas textuales largas van en párrafo aparte, en tamaño 10, sin interlineado y con sangrado de ambos lados de 2 centímetros."</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="bloque">Documentos internos y documentos para autoridad</h3>
+    <p class="lead">La presentación muestra tres ejemplos reales: una carta de honorarios y una tarjeta informativa (documentos internos) y una demanda de amparo indirecto (documento para autoridad). Así se distinguen:</p>
+    <div class="dos-col">
+      <div class="card"><span class="chip">Documentos internos</span><h4>Carta de honorarios · tarjeta informativa</h4>
+        <ul class="lista">
+          <li>Membrete del despacho centrado, con dirección, teléfono y sitio web.</li>
+          <li>Título del documento centrado, en mayúsculas espaciadas.</li>
+          <li>Recuadro gris con los datos del documento (destinatario, remitente, asunto y fecha, o la descripción del asunto).</li>
+          <li>Pie de página con la leyenda <b>CONFIDENCIAL</b> y el número de página («Página 1 de 10»).</li>
+        </ul></div>
+      <div class="card"><span class="chip">Documento para autoridad</span><h4>Demanda de amparo indirecto</h4>
+        <ul class="lista">
+          <li>Sin membrete del despacho.</li>
+          <li>Número de página en la esquina superior derecha.</li>
+          <li>Rubro a la derecha, en negritas (tipo de escrito y, en su caso, «CON CARÁCTER DE URGENTE», subrayado).</li>
+          <li>Autoridad destinataria en mayúsculas y negritas.</li>
+          <li>Apartados con títulos centrados en negritas.</li>
+        </ul></div>
+    </div>
+
+    <h3 class="bloque">Practica la nomenclatura de archivos</h3>
+    <p class="lead">Todo documento se envía <strong>siempre en Word y PDF</strong>, y su nombre debe contener como mínimo: iniciales del cliente, expediente/carpeta/identificación, tipo de documento, fecha del documento y versión. Prueba el generador:</p>
+    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p><b>¿Por qué?</b> Una línea que explique para qué sirven la nomenclatura y el envío en Word y PDF (por ejemplo, qué problema evitan).</p></div>
+    <div class="gen">
+      <h4>Generador de nombre de archivo</h4>
+      <div class="campos">
+        <div><label>Nombre del cliente</label><input id="g-nombre" value="Ricardo Enrique Uribe González"></div>
+        <div><label>Expediente / carpeta / identificación</label><input id="g-exp" value="273/2026"></div>
+        <div><label>Tipo de documento</label><input id="g-tipo" value="Alegatos"></div>
+        <div><label>Fecha (dd/mm/aaaa)</label><input id="g-fecha" value="11/05/2025"></div>
+        <div><label>Versión</label><input id="g-ver" value="1.0"></div>
+      </div>
+      <div class="salida" id="g-salida">REUG (273.2026).- Alegatos.- (11.V.25) v. 1.0</div>
+      <div class="expl">El generador sigue la forma del ejemplo oficial de la presentación: iniciales del cliente · (expediente con puntos) · tipo de documento · (día.mes en número romano.año a dos dígitos) · versión. Ejemplo oficial: <b>REUG (273.2026).- Alegatos.- (11.V.25) v. 1.0</b></div>
+    </div>
+
+    <div class="nota"><strong>Notas del módulo:</strong> la redacción y el formato deben ser consistentes en todo el documento, con estructura clara y lógica. La revisión se hace conforme al Proceso de Revisión Documental. La ortografía y redacción debe ser impecable en todo momento; para ello podrá auxiliarse de la IA.</div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(4)">← Mecánica de trabajo</button>
+    <button class="primario" onclick="irA(6)">Revisión documental →</button>
+  </div>
+</section>
+
+<!-- ============ MÓDULO 5 ============ -->
+<section class="mod" id="sec-m5">
+  <div class="hero">
+    <div class="kicker">Módulo 5</div>
+    <h2>Proceso de revisión documental</h2>
+    <p class="sub">El procedimiento interno que asegura calidad en estructura, contenido, estilo, corrección lingüística y formato. Aplica a todos los documentos generados en el despacho.</p>
+  </div>
+  <div class="contenido">
+    <div class="esencial"><h4>Lo esencial de este módulo</h4><ul class="lista"><li>La clasificación del asunto determina si el documento sigue el proceso A, B o C.</li><li>Se revisan cinco elementos: estructura, contenido, estilo, corrección lingüística y formato.</li><li>La revisión editorial hace la corrección final y genera el compare entre versiones.</li></ul></div>
+
+    <h3 class="bloque">Glosario esencial</h3>
+    <div class="cards">
+      <div class="card"><h4>Documento</h4><p>Cualquier escrito interno o externo.</p></div>
+      <div class="card"><h4>Redactor</h4><p>Quien hace la primera versión.</p></div>
+      <div class="card"><h4>Revisor</h4><p>Quien corrige estructura, contenido y estilo.</p></div>
+      <div class="card"><h4>Coordinador</h4><p>El Coordinador del despacho.</p></div>
+      <div class="card"><h4>Chat</h4><p>Canal interno para instrucciones y entregas del asunto.</p></div>
+    </div>
+
+    <h3 class="bloque">Elementos a revisar</h3>
+    <ul class="lista">
+      <li><strong>Estructura:</strong> diseño conceptual del documento.</li>
+      <li><strong>Contenido:</strong> hechos, argumentos, datos, peticiones.</li>
+      <li><strong>Estilo:</strong> elegancia, claridad, persuasión.</li>
+      <li><strong>Corrección lingüística:</strong> ortografía, gramática, sintaxis.</li>
+      <li><strong>Formato:</strong> márgenes, interlineado, negritas, cursivas, etc.</li>
+    </ul>
+
+    <h3 class="bloque">¿Qué proceso aplica? Explora A, B y C</h3>
+    <p class="lead">La generación de un documento puede solicitarse por un superior, el cliente o la necesidad del asunto. Se consulta la clasificación del asunto y ésta determina el proceso.</p>
+    <div class="tabs" id="tabs-proceso">
+      <button class="tab-btn active" data-t="pa">Proceso A · máxima supervisión</button>
+      <button class="tab-btn" data-t="pb">Proceso B · supervisión intermedia</button>
+      <button class="tab-btn" data-t="pc">Proceso C · supervisión mínima</button>
+    </div>
+    <div class="tab-panel visible" id="panel-pa">
+      <div class="pasos">
+        <div class="paso"><div class="n"></div><div><h4>Propuesta de redactor, revisor y estructura</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Coordinador confirma</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Redactor entrega versión</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Revisor revisa y corrige</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Coordinador valida</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Revisión editorial</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Ejecución documental</h4></div></div>
+      </div>
+    </div>
+    <div class="tab-panel" id="panel-pb">
+      <div class="pasos">
+        <div class="paso"><div class="n"></div><div><h4>Abogado a cargo define redactor, revisor y estructura</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Redactor confirma instrucciones por escrito</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Revisor revisa y determina si es susceptible de revisión</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Se envía a revisión editorial</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Revisor hace última revisión global</h4></div></div>
+      </div>
+    </div>
+    <div class="tab-panel" id="panel-pc">
+      <div class="pasos">
+        <div class="paso"><div class="n"></div><div><h4>Abogado a cargo define redactor, revisor y estructura</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Redactor confirma instrucciones</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Revisor revisa y determina si es susceptible de revisión</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Se ejecuta el documento</h4></div></div>
+      </div>
+    </div>
+
+    <h3 class="bloque">Revisión editorial y evaluación del desempeño</h3>
+    <div class="dos-col">
+      <div class="card"><span class="chip">Revisión editorial</span>
+        <ul class="lista">
+          <li>Corrección lingüística final.</li>
+          <li>Revisión de formato.</li>
+          <li>Entrega de versión tentativamente final.</li>
+          <li>Generación de compare entre versiones.</li>
+        </ul></div>
+      <div class="card"><span class="chip">Evaluación</span>
+        <ul class="lista">
+          <li>Claridad al parafrasear instrucciones de estructura.</li>
+          <li>Casos donde el documento no fue susceptible de revisión.</li>
+          <li>Calidad y cantidad de cambios en compares.</li>
+          <li>Calificación de entrega por revisión editorial.</li>
+        </ul></div>
+    </div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(5)">← Word y plantillas</button>
+    <button class="primario" onclick="irA(7)">Denuncia y expedientes →</button>
+  </div>
+</section>
+
+<!-- ============ MÓDULO 6 ============ -->
+<section class="mod" id="sec-m6">
+  <div class="hero">
+    <div class="kicker">Módulo 6</div>
+    <h2>Denuncia e integración de expedientes</h2>
+    <p class="sub">Denuncia y querella, la estructura obligatoria de dos expedientes, flujo de integración, índices, amparo y reglas generales.</p>
+  </div>
+  <div class="contenido">
+    <div class="esencial"><h4>Lo esencial de este módulo</h4><ul class="lista"><li>Siempre deberá existir al menos dos expedientes: el interno y el de copia íntegra.</li><li>Toda actuación ante el Ministerio Público genera una constancia: fotografía, escaneo, PDF, nombre, integración y bitácora.</li><li>Los acuses se integran el mismo día y los originales del cliente nunca se perforan.</li></ul></div>
+
+    <div class="dos-col">
+      <div class="card"><h4>¿Qué es una denuncia?</h4><p>Acción y efecto de denunciar. Denunciar: avisar o dar noticia de algo. Documento en que se da noticia a la autoridad competente de la comisión de un delito o de una falta.</p></div>
+      <div class="card"><h4>¿Qué es un expediente?</h4><p>Conjunto de todos los papeles correspondientes a un asunto o negocio. Serie ordenada de actuaciones administrativas y también de las judiciales.</p></div>
+    </div>
+
+    <h3 class="bloque">Denuncia y querella</h3>
+    <table class="tabla">
+      <tbody>
+      <tr><th style="width:24%"></th><th>Denuncia</th><th>Querella</th></tr>
+      <tr><td><strong>¿Quién puede presentarla?</strong></td><td>Cualquier persona que tenga conocimiento del hecho.</td><td>Sólo la víctima, el ofendido o la persona legalmente facultada para ello.</td></tr>
+      <tr><td><strong>¿En qué delitos procede?</strong></td><td>En delitos que se persiguen de oficio.</td><td>En delitos que requieren instancia de parte.</td></tr>
+      <tr><td><strong>¿Qué contiene?</strong></td><td>La comunicación de un hecho posiblemente delictivo: su finalidad es informar a la autoridad sobre la posible comisión de un delito.</td><td>La comunicación del hecho más la manifestación de voluntad: además de informar, expresa la voluntad de que se investigue y se persiga penalmente.</td></tr>
+      <tr><td><strong>¿Es requisito de procedibilidad?</strong></td><td>No. Su presentación no condiciona el inicio de la acción penal.</td><td>Sí. Sin querella válida, el Ministerio Público no puede ejercer la acción penal en los delitos que la requieren.</td></tr>
+      <tr><td><strong>Fundamento legal</strong></td><td>Artículo 222 del Código Nacional de Procedimientos Penales.</td><td>Artículo 225 del Código Nacional de Procedimientos Penales.</td></tr>
+      <tr><td><strong>En resumen</strong></td><td>Informa a la autoridad sobre un posible delito para que actúe de oficio.</td><td>Además de informar el delito, expresa la voluntad de que se persiga penalmente.</td></tr>
+      </tbody>
+    </table>
+    <div class="dos-col">
+      <div class="card"><span class="chip">Ejemplos prácticos</span>
+        <p><strong>Denuncia:</strong> un vecino observa un robo y acude al Ministerio Público a reportarlo.</p>
+        <p><strong>Querella:</strong> una persona víctima de fraude acude al Ministerio Público y expresa que desea que se investigue y sancione al responsable.</p></div>
+      <div class="card"><span class="chip">Consecuencia jurídica</span>
+        <p><strong>Delito de oficio + denuncia:</strong> el Ministerio Público debe investigar.</p>
+        <p><strong>Delito que requiere querella + no existe querella:</strong> la investigación y la acción penal no pueden prosperar válidamente por falta de requisito de procedibilidad.</p></div>
+    </div>
+    <div class="nota"><strong>Diferencia clave:</strong> la denuncia sólo pone en conocimiento de la autoridad el hecho delictivo; la querella, además, incorpora la voluntad de la víctima para que se inicie y se continúe con la acción penal. <strong>Fundamento constitucional:</strong> artículo 21 de la Constitución Política de los Estados Unidos Mexicanos — la investigación de los delitos corresponde al Ministerio Público y a las policías, y la persecución de los delitos se realizará de oficio o a petición de parte, en los términos que determine la ley.</div>
+
+    <h3 class="bloque">Flujo: de la denuncia al expediente</h3>
+    <div class="pasos">
+      <div class="paso"><div class="n"></div><div><h4>Presentación de la denuncia o querella</h4><p>El abogado o pasante presenta la denuncia ante el MP correspondiente (FGR o FGJCDMX). Se obtiene el acuse con número de folio.</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Entrega al área de administración</h4><p>El acuse + anexos se entregan al área de administración para inicio del expediente interno. Indicar nombre del cliente, delito denunciado y carpeta de investigación (cuando se tenga).</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Inicio de expediente interno</h4><p>El área de administración genera el expediente físico con la información proporcionada. Etiqueta y entrega a pasantes para incorporar al archivo.</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Integración continua</h4><p>Todos los escritos, acuses y determinaciones se agregan el mismo día en que se presentaron o recibieron, manteniendo el expediente actualizado.</p></div></div>
+    </div>
+
+    <h3 class="bloque">¿De qué depende la integración?</h3>
+    <div class="cards">
+      <div class="card"><div class="icono">📂</div><h4>Tipo de asunto</h4><p>La integración varía según el asunto: amparo, carpeta de investigación, carpeta judicial, etc. Cada tipo tiene sus propios requisitos documentales.</p></div>
+      <div class="card"><div class="icono">🕐</div><h4>Orden cronológico</h4><p>Todos los expedientes deben contar con constancias ordenadas cronológicamente, reflejando la secuencia real de los hechos y actuaciones.</p></div>
+      <div class="card"><div class="icono">🧩</div><h4>Integridad del expediente</h4><p>Deben incluirse todos los acuses, anexos, documentos originales, determinaciones ministeriales y demás constancias relevantes.</p></div>
+    </div>
+
+    <h3 class="bloque">Estructura obligatoria: siempre deberá existir al menos dos expedientes</h3>
+    <div class="dos-col">
+      <div class="card"><span class="chip">1 · Expediente interno</span><h4>Control y seguimiento del asunto</h4>
+        <p>Contiene los <strong>acuses</strong> y la documentación utilizada para el control y seguimiento del expediente. <strong>No sustituye el expediente de investigación.</strong></p></div>
+      <div class="card"><span class="chip">2 · Expediente de copia íntegra</span><h4>Copia íntegra del expediente de investigación</h4>
+        <p>Debe ser una copia exacta, completa e íntegra del expediente de investigación. Incluye todos los documentos, actuaciones y anexos que lo integran.</p></div>
+    </div>
+    <div class="nota"><strong>Ambos expedientes son obligatorios y complementarios.</strong> Su correcta integración garantiza el control, resguardo y trazabilidad del expediente.</div>
+
+    <h3 class="bloque">1 · Expediente interno: documentos mínimos</h3>
+    <p class="lead">Es el expediente que construye el despacho para dar seguimiento al asunto. Aquí deben integrarse todos los documentos generados por nosotros y todas las constancias que acrediten nuestras gestiones. Marca cada documento para verificar que esté completo:</p>
+    <div class="check-lista" id="check-expediente">
+      <div class="check"><div class="caja">✓</div><div>Hoja de control del asunto.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Datos de identificación del cliente.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Poderes o autorizaciones.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Contrato de prestación de servicios.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Estrategia jurídica.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Bitácora de seguimiento.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Escrito de denuncia o querella presentado.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Todos los escritos promovidos posteriormente.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Acuses de presentación.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Citatorios.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Constancias de comparecencia.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Solicitudes de actos de investigación.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Recursos e impugnaciones.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Oficios elaborados por el despacho.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Minutas de reuniones.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Correos electrónicos relevantes y reportes internos.</div></div>
+    </div>
+    <div class="contador-check" id="cont-expediente">0 de 16 documentos marcados</div>
+
+    <div class="nota"><strong>💎 Regla de oro:</strong> toda actuación ante el Ministerio Público genera una constancia — presentación de denuncia, comparecencia, entrega de documentos, solicitud de copias, solicitud de actos de investigación, entrevista ministerial, recepción de notificaciones, desahogo de diligencias.</div>
+
+    <h3 class="bloque">Cada vez que se obtenga una constancia, se debe:</h3>
+    <div class="pasos">
+      <div class="paso"><div class="n"></div><div><h4>Tomar fotografía inmediatamente</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Escanear el documento</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Guardarlo en formato PDF</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Nombrarlo correctamente</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Incorporarlo al Expediente Interno</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Registrar la actuación en la bitácora del asunto</h4></div></div>
+    </div>
+
+    <h3 class="bloque">2 · Expediente de copia íntegra de la carpeta de investigación</h3>
+    <p class="lead">Debe ser una reproducción completa y ordenada de la carpeta de investigación. Su finalidad es que el despacho tenga acceso inmediato a toda la información que obra en poder del Ministerio Público. Debe contener:</p>
+    <div class="check-lista" id="check-copia">
+      <div class="check"><div class="caja">✓</div><div>Denuncia o querella.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Acuerdos ministeriales.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Entrevistas.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Informes policiales.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Dictámenes periciales.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Oficios.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Respuestas a oficios.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Citatorios.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Medidas de protección.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Registros de investigación.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Comparecencias.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Actas circunstanciadas.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Datos de prueba.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Anexos.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Tomos completos.</div></div>
+      <div class="check"><div class="caja">✓</div><div>Actualizaciones periódicas de la carpeta.</div></div>
+    </div>
+    <div class="contador-check" id="cont-copia">0 de 16 documentos marcados</div>
+
+    <h3 class="bloque">Regla de integración: cada vez que se obtengan nuevas copias de la carpeta</h3>
+    <div class="pasos">
+      <div class="paso"><div class="n"></div><div><h4>Revisar que estén completas</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Foliarlas, si es necesario</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Integrarlas cronológicamente</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Actualizar el índice</h4></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Incorporarlas al expediente de copia íntegra</h4></div></div>
+    </div>
+
+    <h3 class="bloque">Índices de la carpeta de investigación</h3>
+    <div class="cards">
+      <div class="card"><h4>¿Para qué sirve?</h4><p>Permite identificar rápidamente los documentos más importantes sin revisar todo el expediente. Facilita el seguimiento del caso y la preparación para actuaciones.</p></div>
+      <div class="card"><h4>¿Qué debe reflejar?</h4><p>Como mínimo: la denuncia o querella, escritos relevantes, acuerdos del MP, determinaciones (NVP, FI, vinculación), periciales y acuerdos judiciales.</p></div>
+      <div class="card"><h4>¿Cómo se actualiza?</h4><p>Cada vez que se agrega un nuevo documento al expediente, debe actualizarse el índice para que sea una guía confiable y vigente del contenido.</p></div>
+    </div>
+
+    <h3 class="bloque">Defensa: ¿con o sin acceso a la carpeta?</h3>
+    <div class="toggle-dos" id="toggle-carpeta">
+      <button class="active" data-t="sin">Sin acceso a la carpeta</button>
+      <button data-t="con">Con acceso a la carpeta</button>
+    </div>
+    <div class="tab-panel visible" id="panel-sin">
+      <div class="card" style="margin-top:14px"><span class="chip">Estrategia: máxima recopilación de información</span>
+        <ul class="lista">
+          <li>Solicitudes de acceso al MP (documentar cada negativa).</li>
+          <li>Versión completa del relato del imputado.</li>
+          <li>Identificación de testigos de defensa.</li>
+          <li>Recopilación de evidencia propia: fotos, videos, mensajes, contratos, etc.</li>
+          <li>Datos de contexto: coartadas, ubicaciones, historial médico.</li>
+          <li>Solicitar al MP copias de determinaciones relevantes.</li>
+          <li>Documentar toda gestión realizada para obtener información.</li>
+        </ul></div>
+    </div>
+    <div class="tab-panel" id="panel-con">
+      <div class="card" style="margin-top:14px"><span class="chip">Objetivo: expediente de copia íntegra completo y actualizado</span>
+        <ul class="lista">
+          <li>Copia íntegra de toda la carpeta de investigación.</li>
+          <li>Todas las actuaciones ministeriales y periciales.</li>
+          <li>Declaraciones del imputado, víctima y testigos.</li>
+          <li>Documentos aportados por la contraparte.</li>
+          <li>Solicitar copia de diligencias a medida que se practican.</li>
+          <li>Acuses de cada promoción o escrito presentado.</li>
+          <li>Índice actualizado con cada nueva incorporación.</li>
+        </ul></div>
+    </div>
+
+    <h3 class="bloque">Audiencias: solicitud a la UGA</h3>
+    <div class="pasos">
+      <div class="paso"><div class="n"></div><div><h4>Identificar si hubo audiencia en el proceso</h4><p>Audiencia de solicitud de orden de aprehensión, inicial, intermedia, de juicio oral, lectura y explicación de sentencia, modificación de medidas cautelares, o cualquier vista ante el Juez de Control.</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Solicitar el registro a la Unidad de Gestión de Audiencias (UGA)</h4><p>Presentar solicitud formal ante la UGA del tribunal correspondiente para obtener el registro (video, audio o acta) de la audiencia celebrada.</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Integrar al expediente físico o electrónico</h4><p>Si es carpeta de investigación o judicial: agregar el acuse de la solicitud y la copia del registro al expediente físico. Si es amparo: guardar en el expediente electrónico.</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Registrar en la bitácora</h4><p>Anotar en la bitácora mensual: fecha de la audiencia, tipo, resultado y número de registro obtenido de la UGA. Indicar si está pendiente de obtener.</p></div></div>
+    </div>
+
+    <h3 class="bloque">Procedimientos alternos o paralelos · nuevos expedientes</h3>
+    <p class="lead">Cada procedimiento alterno o paralelo a la carpeta de investigación requiere la apertura de un expediente independiente.</p>
+    <div class="dos-col">
+      <div class="card"><h4>Acuerdo reparatorio / MASC</h4><p>Nuevo expediente con: acuerdo firmado, acuses de comparecencias, resolución del MP que aprueba el acuerdo, constancia de cumplimiento.</p></div>
+      <div class="card"><h4>Proceso judicial (carpeta judicial)</h4><p>Nuevo expediente con: escrito de formulación de cargos, acuerdos del Juez, resoluciones de audiencias, recursos interpuestos e índice propio.</p></div>
+      <div class="card"><h4>Medidas cautelares</h4><p>Expediente independiente con: solicitud de medidas, resolución judicial, constancias de cumplimiento y cualquier modificación posterior.</p></div>
+      <div class="card"><h4>Juicio civil / familiar paralelo</h4><p>Expediente propio con: demanda, acuses, resoluciones, vinculación con la carpeta penal y notas de conexidad entre ambos procedimientos.</p></div>
+    </div>
+
+    <h3 class="bloque">Juicio de amparo · expediente electrónico</h3>
+    <p class="lead">El amparo <strong>no necesariamente genera expediente físico interno</strong>: el seguimiento es electrónico a través del Portal de Servicios en Línea del Poder Judicial de la Federación. Los acuerdos enviados por el grupo correspondiente deben revisarse por el pasante y corroborarse por el abogado; todos los acuses y constancias electrónicas se resguardan para su consulta oportuna.</p>
+    <div class="dos-col">
+      <div class="card"><span class="chip">Contenido del expediente electrónico</span>
+        <ul class="lista">
+          <li>Demanda de amparo y acuse electrónico.</li>
+          <li>Acuerdos del Juzgado (descargados del Portal PJF).</li>
+          <li>Informes justificados de las autoridades responsables.</li>
+          <li>Acuse de promociones presentadas vía electrónica.</li>
+          <li>Resoluciones interlocutorias y sentencia.</li>
+          <li>Notificaciones electrónicas recibidas.</li>
+          <li>Recursos de revisión y sus acuerdos.</li>
+        </ul></div>
+      <div class="card"><span class="chip">Bitácora mensual del amparo</span>
+        <ul class="lista">
+          <li>Fecha de presentación de la demanda.</li>
+          <li>Número de expediente y Juzgado asignado.</li>
+          <li>Mes a mes: etapa procesal (admisión, suspensión, informe, audiencia constitucional, sentencia).</li>
+          <li>Acuerdos relevantes del período.</li>
+          <li>Próxima actuación o diligencia esperada.</li>
+          <li>Responsable de revisión en el Portal.</li>
+          <li>Estado de la suspensión (si aplica).</li>
+        </ul></div>
+    </div>
+    <details class="acordeon"><summary>Plantilla: bitácora interna de seguimiento de juicio de amparo</summary><div class="cuerpo">
+      <div class="dos-col" style="margin-top:0">
+        <div><h4>1. Datos generales del asunto</h4><p>Cliente · quejoso · autoridad responsable · tercero interesado · número de expediente · tipo de amparo (directo / indirecto) · materia (penal, civil, familiar, administrativa, laboral, otra) · abogado responsable · fecha de apertura.</p></div>
+        <div><h4>2. Estatus procesal actual</h4><p>Etapa procesal · última actuación · fecha de la última actuación · próxima actuación esperada · fecha probable.</p>
+          <div class="semaforo">
+            <span><i style="background:#3f9a3c"></i><b>Sin riesgo:</b>&nbsp;plazos controlados</span>
+            <span><i style="background:#e8b923"></i><b>En atención:</b>&nbsp;plazo próximo a vencer</span>
+            <span><i style="background:#d23b2e"></i><b>En riesgo:</b>&nbsp;plazo vencido o crítico</span>
+          </div></div>
+        <div><h4>3. Control de plazos</h4><p>Por cada actuación (presentación de demanda, prevención, cumplimiento de prevención, informe justificado, alegatos, sentencia, recurso de revisión, cumplimiento de sentencia, otro): fecha de notificación, fecha de inicio, fecha de vencimiento, responsable y estatus.</p></div>
+        <div><h4>4. Cronología del asunto</h4><p>Fecha · actuación · responsable · observaciones.</p></div>
+        <div><h4>5. Seguimiento estratégico</h4><p>Acto reclamado · conceptos de violación principales · riesgos identificados · fortalezas del asunto · criterios relevantes.</p></div>
+        <div><h4>6. Pendientes</h4><p>Pendiente · responsable · fecha compromiso · estatus.</p></div>
+        <div><h4>7. Control documental</h4><p>Demanda de amparo · acuse de presentación · auto de admisión · prevención · cumplimiento de prevención · informe justificado · pruebas · alegatos · sentencia · recurso de revisión · resolución de revisión · constancias de notificación · cumplimiento de sentencia · expediente electrónico descargado · expediente físico integrado.</p></div>
+        <div><h4>8. Observaciones relevantes</h4><h4 style="margin-top:12px">9. Próximo paso</h4><p>Acción a realizar · responsable · fecha compromiso.</p></div>
+      </div>
+      <div class="nota"><strong>Recordatorio clave:</strong> revisar diariamente plazos y notificaciones para evitar preclusiones. La bitácora cierra con el plazo más próximo a vencer (fecha límite) y la última actuación (fecha).</div>
+    </div></details>
+    <div class="nota"><strong>Portales:</strong> Portal de Servicios en Línea del PJF (<i>serviciosenlinea.pjf.gob.mx/juicioenlinea</i>) y servicios del OAJ (<i>oaj.gob.mx</i>).</div>
+
+    <h3 class="bloque">Reglas generales: lo que debes recordar</h3>
+    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p><b>¿Por qué?</b> Una línea que explique la razón de la integración el mismo día y de los dos expedientes, para que se entienda el sentido de la regla y no sólo la regla.</p></div>
+    <div class="cards">
+      <div class="card"><div class="icono">📄</div><h4>Documentos originales</h4><p>Nunca perforar los documentos originales del cliente. Siempre colocarlos en protectores de hojas dentro del expediente.</p></div>
+      <div class="card"><div class="icono">✍️</div><h4>Firmas de clientes</h4><p>Las firmas del cliente deben ser resguardadas por el abogado asignado. No quedan en el área común del despacho.</p></div>
+      <div class="card"><div class="icono">🔤</div><h4>Orden alfabético</h4><p>Los expedientes internos se ordenan alfabéticamente en el archivo del área de pasantes. Siempre devolver el expediente a su lugar.</p></div>
+      <div class="card"><div class="icono">⚡</div><h4>Integración inmediata</h4><p>Los acuses deben integrarse al expediente el mismo día que se presentaron. No dejar constancias pendientes de archivo.</p></div>
+      <div class="card"><div class="icono">💻</div><h4>Expediente electrónico</h4><p>El amparo no necesariamente genera expediente físico; cuando lo haya, debe contener lo más relevante. El electrónico debe estar ordenado y al día. Guardar acuerdos y acuses en la carpeta correspondiente.</p></div>
+      <div class="card"><div class="icono">🪞</div><h4>Consistencia</h4><p>El expediente de copia íntegra debe ser un espejo íntegro de la carpeta de investigación. Cualquier actuación presentada debe reflejarse en él.</p></div>
+    </div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(6)">← Revisión documental</button>
+    <button class="primario" onclick="irA(8)">Proyectos del despacho →</button>
+  </div>
+</section>
+
+<!-- ============ MÓDULO 7 ============ -->
+<section class="mod" id="sec-m7">
+  <div class="hero">
+    <div class="kicker">Módulo 7</div>
+    <h2>Proyectos del despacho</h2>
+    <p class="sub">Todo lo que no es litigio tiende a ser proyecto: portafolio, tipos y metodologías.</p>
+  </div>
+  <div class="contenido">
+    <div class="esencial"><h4>Lo esencial de este módulo</h4><ul class="lista"><li>Todo lo que no es litigio tiende a ser proyecto.</li><li>Los proyectos forman un portafolio permanente, clasificado en tipos A, B y C.</li><li>Se gestionan con el método cascada o, en ambientes cambiantes, con scrum.</li></ul></div>
+
+    <h3 class="bloque">Tres preguntas para entender los proyectos</h3>
+    <details class="acordeon" open><summary>1. ¿Para qué existen los proyectos?</summary><div class="cuerpo">
+      <p><strong>Lo que dice el propedéutico:</strong> todo lo que no es litigio tiende a ser proyecto. Los proyectos forman un portafolio permanente, que no cambia ni se cierra anualmente, hasta en tanto no cambien los designios de Dirección. La OAP se encarga de la planeación anual, el seguimiento y la mejora continua, el desarrollo profesional y los resultados.</p>
+      <div class="pendiente"><span class="chip-pend">Pendiente · lo define: OAP</span><p>Explicar el objetivo de los proyectos: qué busca el despacho con ellos y cómo se relacionan con la visión de «trascender el ejercicio profesional de la abogacía para transformar la realidad social».</p></div>
+    </div></details>
+    <details class="acordeon"><summary>2. ¿Cómo participo en un proyecto?</summary><div class="cuerpo">
+      <p><strong>Lo que dice el propedéutico:</strong> cada proyecto empieza con el nombramiento de una coordinación y de un equipo. Las tareas viven en Teamwork, con responsable, fecha de vencimiento, estado y avance, y las horas se registran en la hoja de horas. En los proyectos tipo C, los avances se revisan en juntas.</p>
+      <div class="pendiente"><span class="chip-pend">Pendiente · lo define: OAP</span><p>Explicar cómo se asigna a una persona a un proyecto, cuánto tiempo se espera que le dedique frente al trabajo de litigio, con qué periodicidad hay juntas y cómo cuenta su participación en las evaluaciones trimestrales.</p></div>
+    </div></details>
+    <details class="acordeon"><summary>3. ¿Qué significan los tipos A, B y C?</summary><div class="cuerpo">
+      <p><strong>Lo que dice el propedéutico:</strong> tipo A, <i>coordinar</i> (administrador principal de tareas, responsables y vencimientos); tipo B, <i>supervisar</i> (revisar y corregir entregables de alta calidad); tipo C, <i>monitorear</i> (revisión de avances en juntas, impulso y seguimiento continuo).</p>
+      <div class="nota"><strong>No confundir</strong> con los procesos A, B y C de revisión documental del módulo 5: son clasificaciones distintas.</div>
+      <div class="pendiente"><span class="chip-pend">Pendiente · lo define: OAP</span><p>Confirmar quién coordina, supervisa o monitorea en cada tipo (¿la OAP?) y qué cambia para quien participa en un proyecto A, B o C.</p></div>
+    </div></details>
+
+    <h3 class="bloque">Un ejemplo: el propedéutico es un proyecto</h3>
+    <p class="lead">Según el portafolio de Desarrollo de Proyectos, el propedéutico que estás tomando es un <strong>proyecto tipo B</strong>.</p>
+    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: OAP</span><p>Describir el proyecto del propedéutico como caso práctico: quién lo coordina, quién integra el equipo, sus objetivos, sus entregables (presentaciones, esta aplicación, cuestionario) y su calendario.</p></div>
+
+    <h3 class="bloque">Funciones de la gestión de proyectos</h3>
+    <div class="cards">
+      <div class="card"><span class="chip">Tipo A</span><h4>Coordinar</h4><p>Administrador principal de tareas, responsables y vencimientos.</p></div>
+      <div class="card"><span class="chip">Tipo B</span><h4>Supervisar</h4><p>Revisar y corregir entregables de alta calidad.</p></div>
+      <div class="card"><span class="chip">Tipo C</span><h4>Monitorear</h4><p>Revisión de avances en juntas. Impulso y seguimiento continuo.</p></div>
+    </div>
+
+    <h3 class="bloque">Desarrollo de proyectos</h3>
+    <p class="lead">Documento estático que contiene los proyectos del despacho. No cambian ni se cierran anualmente: es el portafolio permanente hasta en tanto no cambien los designios de Dirección.</p>
+    <table class="tabla">
+      <tbody><tr><th style="width:120px">Tipo A</th><td>Mejora de procesos · Contención · Asesoría estratégica · Servicios de consultoría política</td></tr>
+      <tr><th>Tipo B</th><td>Propedéutico · Política pública · Práctica pro bono · Bienestar interno · Academia · Presencia digital</td></tr>
+      <tr><th>Tipo C</th><td>Talleres semanales · Desarrollo profesional · Desarrollo de nuevos servicios · Teambuilding · Eventos</td></tr>
+    </tbody></table>
+
+    <h3 class="bloque">Comparador de metodologías</h3>
+    <div class="toggle-dos" id="toggle-metodo">
+      <button class="active" data-t="cascada">Método cascada</button>
+      <button data-t="scrum">Método scrum</button>
+    </div>
+    <div class="tab-panel visible" id="panel-cascada">
+      <p style="margin-top:14px"><i>Metodología secuencial para una ejecución estructurada y previsible de proyectos legales.</i></p>
+      <div class="pasos">
+        <div class="paso"><div class="n"></div><div><h4>Nombramiento de coordinación</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Nombramiento de equipo</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Repaso y rediseño de objetivos</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Asignación de tareas relevantes</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Rigor en fechas y calendarios</h4></div></div>
+      </div>
+    </div>
+    <div class="tab-panel" id="panel-scrum">
+      <p style="margin-top:14px"><i>Un método de administración diseñado para ambientes productivos dinámicos y cambiantes.</i></p>
+      <div class="pasos">
+        <div class="paso"><div class="n"></div><div><h4>Nombramiento de coordinación</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Nombramiento de equipo</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Definición inicial de objetivos</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Revisión de objetivos y prioridades</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Modificación en función de coyuntura</h4></div></div>
+      </div>
+      <h4 style="margin-top:22px;color:var(--verde);font-size:19px">El proceso scrum</h4>
+      <div class="pasos">
+        <div class="paso"><div class="n"></div><div><h4>Pila del producto</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Reunión de planificación del sprint</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Pila del sprint</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Sprint de 1 a 4 semanas</h4><p>Incluye un scrum diario (cada 24 horas).</p></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Trabajo terminado</h4></div></div>
+        <div class="paso"><div class="n"></div><div><h4>Revisión del sprint y retrospectiva del sprint</h4></div></div>
+      </div>
+      <p class="contador-check">Participantes que muestra el diagrama de la presentación: dueño del producto, maestro scrum y equipo.</p>
+    </div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(7)">← Denuncia y expedientes</button>
+    <button class="primario" onclick="irA(9)">Plataformas de la firma →</button>
+  </div>
+</section>
+
+<!-- ============ MÓDULO 8 ============ -->
+<section class="mod" id="sec-m8">
+  <div class="hero">
+    <div class="kicker">Módulo 8</div>
+    <h2>Plataformas de la firma</h2>
+    <p class="sub">Las herramientas de trabajo del despacho, con Teamwork como centro de operaciones.</p>
+  </div>
+  <div class="contenido">
+    <div class="esencial"><h4>Lo esencial de este módulo</h4><ul class="lista"><li>Teamwork es el centro de operaciones: clientes, proyectos, tareas, tiempos y documentos.</li><li>Las horas se registran en la hoja de horas, como facturables o no facturables.</li><li>La comunicación y los archivos van dentro del proyecto, no en correos sueltos.</li></ul></div>
+
+    <h3 class="bloque">Las cinco herramientas</h3>
+    <div class="cards">
+      <div class="card"><div class="icono">🗂️</div><h4>Teamwork</h4><p>Plataforma central de proyectos y trabajo.</p></div>
+      <div class="card"><div class="icono">💬</div><h4>WhatsApp</h4><p>Mensajería rápida con clientes y equipo.</p></div>
+      <div class="card"><div class="icono">📅</div><h4>Calendar</h4><p>Agenda y citas del despacho.</p></div>
+      <div class="card"><div class="icono">✳️</div><h4>Claude</h4><p>Asistente de IA para redacción y análisis.</p></div>
+      <div class="card"><div class="icono">✉️</div><h4>Outlook</h4><p>Correo electrónico profesional del despacho.</p></div>
+    </div>
+
+    <h3 class="bloque">Teamwork: el centro de operaciones</h3>
+    <p class="lead">Centraliza en un solo lugar las tareas, los tiempos, los clientes, los documentos y la planificación del equipo. Desde un asunto legal hasta las horas dedicadas, todo queda organizado y accesible para todo el despacho. Explora sus diez módulos:</p>
+    <details class="acordeon"><summary>01 · Clientes</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> El módulo donde se concentran todos los clientes del despacho y sus proyectos asociados.</p><ul class="lista"><li>Vista de lista con cada cliente y su propietario asignado.</li><li>Indicador de avance (% de tareas) por cliente.</li><li>Columnas de salud del cliente y presupuesto.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> centraliza la relación con cada cliente y evita depender de la memoria de cada abogado.</p></div></details>
+    <details class="acordeon"><summary>02 · Proyectos</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> El listado maestro de todos los proyectos activos del despacho (actualmente más de 120).</p><ul class="lista"><li>Vista en cuadrícula o lista, con responsable, cliente, tipo y estado.</li><li>Acceso directo a proyectos recientes y favoritos.</li><li>Creación con plantillas para estandarizar la estructura.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> estandariza cómo se organiza el trabajo en todo el despacho.</p></div></details>
+    <details class="acordeon"><summary>03 · Tareas (vista lista)</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> El detalle de las tareas dentro de un proyecto, organizadas en listas temáticas.</p><ul class="lista"><li>Cada tarea con responsable, fecha de vencimiento, estado y avance.</li><li>Subtareas, archivos adjuntos y comentarios.</li><li>Lo vencido se resalta en rojo para priorizar lo urgente.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> nada se pierde; toda responsabilidad tiene dueño y fecha.</p></div></details>
+    <details class="acordeon"><summary>04 · Tiempo / Hoja de horas ⭐</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> La función para registrar y consultar las horas de trabajo dedicadas a cada tarea y proyecto. <em>Módulo destacado.</em></p><ul class="lista"><li>Hoja semanal con totales diarios y semanales automáticos.</li><li>Temporizador en vivo o carga manual; copiar la semana anterior.</li><li>Marcado facturable / no facturable por registro.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> convierte el trabajo en datos medibles y facturables.</p></div></details>
+    <details class="acordeon"><summary>05 · Recursos / Carga de trabajo</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> La planificación de la capacidad del equipo: cuántas horas tiene asignada cada persona.</p><ul class="lista"><li>Vista de calendario por persona y día.</li><li>Horas asignadas frente a la capacidad disponible.</li><li>Vistas: visión general, programar, carga, portafolio y gráfico.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> previene el agotamiento del equipo y mejora la distribución del trabajo.</p></div></details>
+    <details class="acordeon"><summary>06 · Tablero de control (dashboard)</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> El panel de resumen de un proyecto, con gráficos e indicadores clave.</p><ul class="lista"><li>Gráficos del estado de tareas (atrasadas, en proceso, próximas).</li><li>Resumen de hitos, presupuesto y tiempo registrado.</li><li>Desglose de la carga de trabajo por usuario.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> visión gerencial inmediata, sin necesidad de entrar al detalle.</p></div></details>
+    <details class="acordeon"><summary>07 · Hitos</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> Los puntos de control o entregables clave de un proyecto, cada uno con fecha.</p><ul class="lista"><li>Hito con fecha, responsable y descripción.</li><li>Barra de porcentaje completado.</li><li>Vistas: Todo, Próximos y Atrasados.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> alinea al equipo en torno a las metas que realmente importan.</p></div></details>
+    <details class="acordeon"><summary>08 · Archivos</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> El repositorio documental de cada proyecto.</p><ul class="lista"><li>Documentos del proyecto (PDF, Word, etc.) con autor, fecha y tamaño.</li><li>Integración con Google Drive.</li><li>Vista previa, descarga e historial de versiones.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> elimina la dispersión de documentos en correos y carpetas personales.</p></div></details>
+    <details class="acordeon"><summary>09 · Línea de tiempo / Gantt</summary><div class="cuerpo"><p><strong>¿Qué es?</strong> La vista cronológica del proyecto, con las tareas distribuidas en el tiempo.</p><ul class="lista"><li>Barras de tareas a lo largo de un calendario.</li><li>Dependencias entre tareas.</li><li>Responsables, duración y % de avance visibles.</li></ul><p style="margin-top:10px"><strong>Beneficio:</strong> convierte un plan abstracto en una línea de tiempo visual y manejable.</p></div></details>
+    <details class="acordeon"><summary>10 · Funciones adicionales — menú "Más"</summary><div class="cuerpo"><p>Herramientas complementarias dentro de cada proyecto, para concentrar comunicación, documentación y colaboración en un solo entorno:</p><ul class="lista"><li><strong>Formularios:</strong> captar solicitudes o altas de asuntos.</li><li><strong>Boletos (tickets):</strong> solicitudes tipo mesa de ayuda.</li><li><strong>Mensajes:</strong> comunicación interna del proyecto.</li><li><strong>Comentarios:</strong> conversación ligada a cada tarea.</li><li><strong>Cuadernos:</strong> documentar procesos y notas.</li><li><strong>Enlaces:</strong> accesos a recursos externos.</li><li><strong>Personas:</strong> integrantes del proyecto.</li><li><strong>Pruebas (proofing):</strong> revisar y aprobar documentos.</li><li><strong>Configuración:</strong> ajustes del proyecto.</li></ul><p style="margin-top:10px">Conviene adoptar primero las más relevantes (Mensajes, Cuadernos, Formularios) y sumar el resto gradualmente.</p></div></details>
+
+    <h3 class="bloque">En resumen: una sola plataforma para todo el despacho</h3>
+    <div class="dos-col">
+      <div class="card"><h4>Un centro de operaciones</h4><p>Clientes, proyectos, tareas, tiempos y documentos en un solo lugar.</p></div>
+      <div class="card"><h4>El tiempo se vuelve dato</h4><p>Las horas se registran, se miden y se facturan con precisión.</p></div>
+      <div class="card"><h4>Visibilidad para decidir</h4><p>Dashboards, recursos e hitos para anticipar riesgos y planificar mejor.</p></div>
+      <div class="card"><h4>Menos dispersión</h4><p>Comunicación y archivos dentro del proyecto, no en correos sueltos.</p></div>
+    </div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(8)">← Proyectos del despacho</button>
+    <button class="primario" onclick="irA(10)">Autoevaluación →</button>
+  </div>
+</section>
+
+<!-- ============ AUTOEVALUACIÓN ============ -->
+<section class="mod" id="sec-quiz">
+  <div class="hero">
+    <div class="kicker">Cierre del taller</div>
+    <h2>Autoevaluación</h2>
+    <p class="sub"><span id="quiz-total">Diecinueve</span> preguntas de repaso sobre las reglas esenciales del despacho, con retroalimentación inmediata. Al finalizar, tu nombre y calificación se envían al despacho.</p>
+  </div>
+  <div class="contenido">
+    <div class="gen" id="quiz-gate">
+      <h4>Antes de comenzar, escribe tu nombre</h4>
+      <div class="campos">
+        <div><label>Nombre completo</label><input id="quiz-nombre" placeholder="Nombre y apellidos"></div>
+      </div>
+      <div class="expl" style="margin-top:12px">Al terminar el cuestionario, tu nombre y tu calificación se envían al despacho.</div>
+      <button class="tab-btn" style="margin-top:14px;border-color:var(--dorado);color:var(--dorado-suave)" onclick="iniciarQuiz()">Comenzar cuestionario</button>
+      <div class="expl" id="quiz-gate-error" style="color:#f0b9a4;display:none;margin-top:8px">Escribe tu nombre completo para poder comenzar.</div>
+    </div>
+    <div id="quiz" style="display:none"></div>
+    <div class="quiz-score" id="quiz-score">
+      <div class="num" id="quiz-num">–</div>
+      <p id="quiz-msj"></p>
+      <p id="quiz-envio" style="margin-top:10px;font-family:var(--sans);font-size:13px;color:var(--dorado-suave)"></p>
+      <p style="margin-top:6px;font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.65)">Si reintentas, el nuevo resultado se registra como un intento adicional; el primero se conserva.</p>
+      <button class="tab-btn" style="margin-top:14px;border-color:var(--dorado);color:var(--dorado-suave)" onclick="reiniciarQuiz()">Reintentar</button>
+    </div>
+    <div class="gen quiz-comentario" style="margin-top:30px">
+      <h4>¿Qué tema no te quedó claro?</h4>
+      <div class="expl" style="margin-top:0">Tu respuesta ayuda a mejorar el propedéutico para la siguiente generación. Puedes enviarla aunque no hayas terminado el cuestionario.</div>
+      <textarea id="comentario-texto" placeholder="Por ejemplo: no me quedó claro cómo se asignan los proyectos…"></textarea>
+      <button class="tab-btn" style="margin-top:12px;border-color:var(--dorado);color:var(--dorado-suave)" onclick="enviarComentario()">Enviar comentario</button>
+      <div class="expl" id="comentario-aviso"></div>
+    </div>
+    <div class="nota" style="margin-top:30px"><strong>¡Gracias!</strong> Con esto concluye el taller propedéutico. Ante cualquier duda, acude a tu abogado asignado o al Coordinador del despacho.</div>
+  </div>
+  <div class="pie-nav">
+    <button onclick="irA(9)">← Plataformas de la firma</button>
+    <button class="primario" disabled>Fin →</button>
+  </div>
+</section>
+  </main>
+</div>
+
+<script>
+/* ====== estructura de navegación; el contenido de cada sección se inyecta abajo ====== */
+const SECCIONES = [
+  {id:'inicio',   num:'·', titulo:'Bienvenida'},
+  {id:'primeros', num:'0', titulo:'Primeros días'},
+  {id:'m1', num:'1', titulo:'Introducción a SDA'},
+  {id:'m2', num:'2', titulo:'¿Qué hacemos?'},
+  {id:'m3', num:'3', titulo:'Mecánica de trabajo'},
+  {id:'m4', num:'4', titulo:'Word y plantillas'},
+  {id:'m5', num:'5', titulo:'Revisión documental'},
+  {id:'m6', num:'6', titulo:'Denuncia y expedientes'},
+  {id:'m7', num:'7', titulo:'Proyectos del despacho'},
+  {id:'m8', num:'8', titulo:'Plataformas de la firma'},
+  {id:'quiz', num:'✓', titulo:'Autoevaluación'},
+];
+const visitadas = new Set();
+/* Cambia a false para ocultar los recuadros «Pendiente» antes de publicar para pasantes. */
+const MOSTRAR_PENDIENTES = true;
+let actual = 0;
+
+function irA(i){
+  document.body.classList.remove('nav-abierta');
+  actual = Math.max(0, Math.min(SECCIONES.length-1, i));
+  document.querySelectorAll('section.mod').forEach(s=>s.classList.remove('visible'));
+  const sec = document.getElementById('sec-'+SECCIONES[actual].id);
+  if(sec) sec.classList.add('visible');
+  visitadas.add(SECCIONES[actual].id);
+  pintarNav();
+  window.scrollTo({top:0});
+}
+function irAId(id){ irA(SECCIONES.findIndex(s=>s.id===id)); }
+function pintarNav(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML = '';
+  SECCIONES.forEach((s,i)=>{
+    const b = document.createElement('button');
+    b.className = 'nav-item' + (i===actual?' active':'') + (visitadas.has(s.id)?' visitado':'');
+    b.innerHTML = `<span class="nav-num">${s.num}</span><span>${s.titulo}</span>`;
+    b.onclick = ()=>irA(i);
+    nav.appendChild(b);
+  });
+  const n = visitadas.size;
+  document.getElementById('prog-txt').textContent = `${n} de ${SECCIONES.length} secciones visitadas`;
+  document.getElementById('prog-bar').style.width = (n/SECCIONES.length*100)+'%';
+}
+
+/* ---- índice de bienvenida ---- */
+document.getElementById('indice-inicio').innerHTML = SECCIONES.slice(1,SECCIONES.length-1).map((s,i)=>
+  `<div class="paso" style="cursor:pointer" onclick="irA(${i+1})"><div class="n"></div><div><h4>${s.titulo}</h4></div></div>`).join('');
+
+/* ---- organigrama ---- */
+const ORG = {
+  socio:'<strong>Socio director:</strong> dirigir al despacho al cumplimiento de misión, visión, valores y objetivos estratégicos, captación de clientes y representación institucional. Diseñar implementación de estrategias, aprobar planes de la OAP, entre otros.',
+  coord:'<strong>Coordinador de SDA:</strong> diseñar planes, programas y proyectos anuales, designar responsables de proyectos, dar acompañamiento continuo, asegurar la operación del Sistema de Mejoración Continua, entre otros.',
+  abogados:'<strong>Abogados:</strong> diseñar, implementar y supervisar estrategias jurídicas, atender clientes, redactar documentos, revisar los asuntos asignados, entre otros.',
+  pasantes:'<strong>Pasantes:</strong> responsabilidad en los asuntos asignados, atender consultas de clientes o potenciales clientes, informar eventualidades e incidencias, seguimiento de los asuntos, entre otros.',
+  ofcounsel:'<strong>Of counsel:</strong> prestar apoyo estratégico al despacho en carácter consultivo, emitir opiniones sobre escritos, legislación, estrategias o documentos relevantes, entre otros.',
+  admin:'<strong>Personal administrativo:</strong> llevar la gestión administrativa material, financiera, contable, de recursos humanos, coordinar mantenimiento, recibir llamadas, visitas, correspondencia, entre otros.',
+  oap:'<strong>Oficina de Administración de Proyectos (OAP):</strong> planeación anual, seguimiento y mejora continua, desarrollo profesional y resultados.'
+};
+document.querySelectorAll('.nodo').forEach(n=>{
+  n.onclick = ()=>{
+    document.querySelectorAll('.nodo').forEach(x=>x.classList.remove('sel'));
+    n.classList.add('sel');
+    document.getElementById('org-info').innerHTML = ORG[n.dataset.org];
+  };
+});
+
+/* ---- checklists genéricas ---- */
+function activarChecks(contId, contadorId, total){
+  const cont = document.getElementById(contId);
+  if(!cont) return;
+  cont.querySelectorAll('.check').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      c.classList.toggle('marcado');
+      if(contadorId){
+        const n = cont.querySelectorAll('.check.marcado').length;
+        document.getElementById(contadorId).textContent =
+          `${n} de ${total} documentos marcados` + (n===total ? ' — ¡expediente completo! ✅' : '');
+      }
+    });
+  });
+}
+activarChecks('check-expediente','cont-expediente',16);
+activarChecks('check-copia','cont-copia',16);
+
+/* ---- resaltado del documento de ejemplo (módulo 4) ---- */
+document.querySelectorAll('#reglas-formato .check[data-hl]').forEach(c=>{
+  const objetivos = ()=>document.querySelectorAll('.hl-'+c.dataset.hl);
+  c.addEventListener('mouseenter', ()=>objetivos().forEach(o=>{o.style.background='#f3e8c8'; o.style.transition='background .2s';}));
+  c.addEventListener('mouseleave', ()=>objetivos().forEach(o=>{o.style.background='transparent';}));
+});
+activarChecks('reglas-formato', null, 0);
+
+/* ---- generador de nombre de archivo ---- */
+const ROMANOS = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+function generarNombre(){
+  const nombre = document.getElementById('g-nombre').value.trim();
+  const PARTICULAS = ['de','del','la','las','los','y','e'];
+  const iniciales = nombre.split(/\s+/).filter(p=>p && !PARTICULAS.includes(p.toLowerCase())).map(p=>p[0].toUpperCase()).join('');
+  const exp = document.getElementById('g-exp').value.trim().replace(/\//g,'.');
+  const tipo = document.getElementById('g-tipo').value.trim();
+  const f = document.getElementById('g-fecha').value.trim().match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  let fecha = '…';
+  if(f){
+    const d = parseInt(f[1]), m = parseInt(f[2]);
+    fecha = (d>=1 && d<=31 && m>=1 && m<=12) ? `${d}.${ROMANOS[m-1]}.${f[3].slice(-2)}` : 'fecha inválida';
+  }
+  const ver = document.getElementById('g-ver').value.trim();
+  document.getElementById('g-salida').textContent =
+    `${iniciales||'____'} (${exp||'___'}).- ${tipo||'Documento'}.- (${fecha}) v. ${ver||'1.0'}`;
+}
+['g-nombre','g-exp','g-tipo','g-fecha','g-ver'].forEach(id=>document.getElementById(id).addEventListener('input', generarNombre));
+generarNombre();
+
+/* ---- tabs y toggles ---- */
+function activarTabs(grupoId, prefijo){
+  const g = document.getElementById(grupoId);
+  if(!g) return;
+  g.querySelectorAll('button').forEach(b=>{
+    b.onclick = ()=>{
+      g.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      g.parentElement.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('visible'));
+      document.getElementById(prefijo + b.dataset.t).classList.add('visible');
+    };
+  });
+}
+activarTabs('tabs-proceso','panel-');
+activarTabs('toggle-carpeta','panel-');
+activarTabs('toggle-metodo','panel-');
+
+/* ---- quiz ---- */
+const PREGUNTAS = [
+ {q:'¿Cuál es la fuente y el tamaño del formato general del despacho?',
+  ops:['Garamond, tamaño 12','Times New Roman, tamaño 11','Arial, tamaño 12'], ok:0,
+  fb:'Garamond 12, con interlineado 1.5, párrafo justificado y márgenes de 2.5.'},
+ {q:'¿Cómo se escribe la legislación en los documentos del despacho?',
+  ops:['En cursivas','En negritas','Subrayada'], ok:1,
+  fb:'La legislación va en negritas; los correos y fechas en cursivas; las direcciones subrayadas y sin abreviaturas.'},
+ {q:'En la redacción del despacho se debe evitar…',
+  ops:['La voz pasiva y el gerundio','Las oraciones cortas','Las citas textuales'], ok:0,
+  fb:'Se evita el uso de la voz pasiva y del gerundio.'},
+ {q:'¿En qué formatos se envía siempre todo documento?',
+  ops:['Solo Word','Solo PDF','Word y PDF, siempre'], ok:2,
+  fb:'Los documentos deben enviarse en versiones Word y PDF, siempre.'},
+ {q:'¿Cuál es el nombre de archivo correcto para los alegatos del amparo 273/2026 de Ricardo Enrique Uribe González (11 de mayo de 2025, versión 1.0)?',
+  ops:['Alegatos-Uribe-final.docx','REUG (273.2026).- Alegatos.- (11.V.25) v. 1.0','273-2026_alegatos_v1'], ok:1,
+  fb:'Iniciales del cliente, expediente/carpeta/identificación, tipo de documento, fecha del documento y versión, en la forma del ejemplo oficial.'},
+ {q:'¿Qué proceso de revisión exige la máxima supervisión?',
+  ops:['Proceso A','Proceso B','Proceso C'], ok:0,
+  fb:'Proceso A: máxima supervisión (incluye confirmación y validación del Coordinador y revisión editorial).'},
+ {q:'La regla de oro ante el Ministerio Público es…',
+  ops:['Toda actuación genera una constancia','Todo escrito requiere firma del socio','Toda audiencia requiere minuta'], ok:0,
+  fb:'Toda actuación ante el MP genera una constancia, y cada constancia se fotografía, escanea, guarda en PDF, se nombra, se integra y se registra en bitácora.'},
+ {q:'¿Cuándo deben integrarse los acuses al expediente interno?',
+  ops:['Dentro de la semana','El mismo día en que se presentaron','Al cierre del mes'], ok:1,
+  fb:'La integración es inmediata: el mismo día en que se presentaron o recibieron.'},
+ {q:'¿Qué NUNCA se hace con los documentos originales del cliente?',
+  ops:['Escanearlos','Perforarlos','Ponerlos en protectores de hojas'], ok:1,
+  fb:'Nunca se perforan; siempre van en protectores de hojas dentro del expediente.'},
+ {q:'El seguimiento del juicio de amparo se lleva principalmente…',
+  ops:['En expediente físico obligatorio','De forma electrónica, vía el Portal del PJF','En el archivo del área común'], ok:1,
+  fb:'El amparo no necesariamente genera expediente físico interno: el seguimiento es electrónico en el Portal de Servicios en Línea del PJF.'},
+ {q:'¿Hasta qué hora es la jornada regular del despacho?',
+  ops:['18:00 horas','19:00 horas','20:00 horas'], ok:1,
+  fb:'Jornada regular hasta las 19:00 horas, sin labores en fines de semana y con home office hasta 4 días al mes.'},
+ {q:'¿Cuál es la plataforma central de proyectos y trabajo del despacho?',
+  ops:['Outlook','Teamwork','WhatsApp'], ok:1,
+  fb:'Teamwork es el centro de operaciones: clientes, proyectos, tareas, tiempos y documentos en un solo lugar.'},
+ {q:'¿En qué se especializa el despacho?',
+  ops:['Derecho corporativo','Litigio penal estratégico','Derecho familiar'], ok:1,
+  fb:'Litigio penal estratégico, con representación integral desde la investigación inicial hasta los juicios orales y los medios de impugnación.'},
+ {q:'¿Qué debe hacerse con cada instrucción que recibes?',
+  ops:['Tomar notas','Esperar a que la repitan por escrito','Reenviarla al Coordinador'], ok:0,
+  fb:'Una de las expectativas del despacho es tomar notas de cada instrucción, además de reportar avances y proponer alternativas.'},
+ {q:'Después de una audiencia, la buena práctica es…',
+  ops:['Esperar la siguiente junta para informar','Registrarla en minuta interna y comunicarla de inmediato al cliente y/o socio responsable','Sólo guardar el acta en el expediente'], ok:1,
+  fb:'Registro posterior en minuta interna y comunicación inmediata al cliente y/o socio responsable.'},
+ {q:'Según el propedéutico, ¿qué tiende a ser proyecto?',
+  ops:['Todo asunto de litigio','Todo lo que no es litigio','Sólo lo que asigna Dirección'], ok:1,
+  fb:'Todo lo que no es litigio tiende a ser proyecto.'},
+ {q:'¿Qué tipo de proyecto es el propedéutico?',
+  ops:['Tipo A','Tipo B','Tipo C'], ok:1,
+  fb:'En el portafolio de Desarrollo de Proyectos, el propedéutico aparece como proyecto tipo B.'},
+ {q:'¿Qué canal define el proceso de revisión como canal interno para instrucciones y entregas del asunto?',
+  ops:['El Chat','Outlook','Calendar'], ok:0,
+  fb:'El glosario del proceso de revisión documental define el Chat como canal interno para instrucciones y entregas del asunto.'},
+ {q:'¿Quién genera el expediente físico interno cuando se presenta una denuncia?',
+  ops:['El pasante que la presentó','El área de administración','El Coordinador'], ok:1,
+  fb:'El acuse y sus anexos se entregan al área de administración, que genera el expediente físico y lo entrega a pasantes para incorporarlo al archivo.'},
+];
+/* ---- registro de resultados (Google Forms del despacho) ---- */
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdfOtTtBkATLRTAZ37Un2C3MUYBynPYoTZH1E8CLuO3KmTI8w/formResponse';
+const FORM_CAMPOS = {nombre:'entry.1108133848', calificacion:'entry.1743478948', detalle:'entry.611029486'};
+let quizNombre = '';
+let intento = 0;
+function iniciarQuiz(){
+  const n = document.getElementById('quiz-nombre').value.trim();
+  if(n.split(/\s+/).length < 2){
+    document.getElementById('quiz-gate-error').style.display = 'block';
+    return;
+  }
+  quizNombre = n;
+  document.getElementById('quiz-gate').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  pintarQuiz();
+}
+function enviarResultado(aciertos){
+  const detalle = PREGUNTAS.map((p,i)=>
+    `${i+1}. ${respuestas[i]===p.ok ? 'Correcta' : 'Incorrecta (eligió: ' + p.ops[respuestas[i]] + ')'}`).join('\n');
+  const datos = new URLSearchParams();
+  datos.append(FORM_CAMPOS.nombre, quizNombre);
+  datos.append(FORM_CAMPOS.calificacion, `${aciertos} / ${PREGUNTAS.length} (intento ${intento})`);
+  datos.append(FORM_CAMPOS.detalle, `Intento ${intento}${intento>1 ? ' (las respuestas correctas ya se habían mostrado en el intento anterior)' : ''}\n` + detalle);
+  const aviso = document.getElementById('quiz-envio');
+  fetch(FORM_URL, {method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: datos.toString()})
+    .then(()=>{ aviso.textContent = `Resultado de ${quizNombre} (intento ${intento}) enviado al despacho. Si tienes dudas sobre su registro, confírmalo con la Coordinación.`; })
+    .catch(()=>{
+      const enlace = FORM_URL.replace('formResponse','viewform') +
+        `?usp=pp_url&${FORM_CAMPOS.nombre}=${encodeURIComponent(quizNombre)}&${FORM_CAMPOS.calificacion}=${encodeURIComponent(aciertos + ' / ' + PREGUNTAS.length)}`;
+      aviso.innerHTML = `No se pudo registrar automáticamente (revisa tu conexión). ` +
+        `<a href="${enlace}" target="_blank" rel="noopener" style="color:var(--dorado)">Toca aquí para registrar tu resultado</a>.`;
+    });
+}
+let respuestas;
+function pintarQuiz(){
+  intento++;
+  respuestas = new Array(PREGUNTAS.length).fill(null);
+  const cont = document.getElementById('quiz');
+  cont.innerHTML = PREGUNTAS.map((p,i)=>`
+    <div class="quiz-q" id="q-${i}">
+      <h4>${i+1}. ${p.q}</h4>
+      <div class="ops">${p.ops.map((o,j)=>`<button onclick="responder(${i},${j})">${o}</button>`).join('')}</div>
+      <div class="fb" id="fb-${i}"></div>
+    </div>`).join('');
+  document.getElementById('quiz-score').classList.remove('visible');
+}
+function responder(i,j){
+  if(respuestas[i]!==null) return;
+  respuestas[i]=j;
+  const p = PREGUNTAS[i];
+  const botones = document.querySelectorAll(`#q-${i} .ops button`);
+  botones.forEach((b,k)=>{ b.disabled=true; if(k===p.ok) b.classList.add('ok'); else if(k===j) b.classList.add('mal'); });
+  const fb = document.getElementById('fb-'+i);
+  const bien = j===p.ok;
+  fb.className = 'fb visible ' + (bien?'bien':'err');
+  fb.innerHTML = (bien?'✅ Correcto. ':'✖ No exactamente. ') + p.fb;
+  if(respuestas.every(r=>r!==null)){
+    const n = respuestas.filter((r,k)=>r===PREGUNTAS[k].ok).length;
+    document.getElementById('quiz-num').textContent = `${n} / ${PREGUNTAS.length}`;
+    document.getElementById('quiz-msj').textContent =
+      n===PREGUNTAS.length ? '¡Impecable! Dominas las reglas esenciales del despacho.' :
+      n>=Math.ceil(PREGUNTAS.length*0.75) ? 'Muy bien. Repasa los temas donde fallaste antes de tu primera semana.' :
+      'Vale la pena repasar los módulos correspondientes; el detalle importa en SDA.';
+    document.getElementById('quiz-score').classList.add('visible');
+    document.getElementById('quiz-score').scrollIntoView({behavior:'smooth'});
+    enviarResultado(n);
+  }
+}
+function reiniciarQuiz(){ pintarQuiz(); window.scrollTo({top:0}); }
+
+/* ---- pendientes ---- */
+document.body.classList.toggle('ocultar-pendientes', !MOSTRAR_PENDIENTES);
+(function(){
+  const n = document.querySelectorAll('.pendiente').length + document.querySelectorAll('.termino.pend').length;
+  const av = document.getElementById('aviso-editor');
+  if(av) av.innerHTML = `<b>Versión de trabajo:</b> hay ${n} espacios marcados como «Pendiente» (recuadros punteados), cuyo contenido debe definir el despacho. Para ocultarlos antes de publicar, cambia <code>MOSTRAR_PENDIENTES</code> a <code>false</code> en el código.`;
+})();
+
+/* ---- glosario ---- */
+const normalizar = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+document.getElementById('glosario-buscar').addEventListener('input', e=>{
+  const q = normalizar(e.target.value.trim());
+  document.querySelectorAll('#glosario .termino').forEach(t=>{
+    t.style.display = !q || normalizar(t.textContent).includes(q) ? '' : 'none';
+  });
+});
+
+/* ---- total de preguntas ---- */
+const NUMEROS = {12:'Doce',13:'Trece',14:'Catorce',15:'Quince',16:'Dieciséis',17:'Diecisiete',18:'Dieciocho',19:'Diecinueve',20:'Veinte'};
+document.getElementById('quiz-total').textContent = NUMEROS[PREGUNTAS.length] || PREGUNTAS.length;
+
+/* ---- pregunta abierta ---- */
+function enviarComentario(){
+  const texto = document.getElementById('comentario-texto').value.trim();
+  const aviso = document.getElementById('comentario-aviso');
+  if(!texto){ aviso.textContent = 'Escribe tu comentario antes de enviarlo.'; return; }
+  const nombre = quizNombre || document.getElementById('quiz-nombre').value.trim() || 'Sin nombre';
+  const datos = new URLSearchParams();
+  datos.append(FORM_CAMPOS.nombre, nombre);
+  datos.append(FORM_CAMPOS.calificacion, 'Comentario');
+  datos.append(FORM_CAMPOS.detalle, 'Tema no claro: ' + texto);
+  fetch(FORM_URL, {method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: datos.toString()})
+    .then(()=>{ aviso.textContent = 'Comentario enviado. ¡Gracias!'; document.getElementById('comentario-texto').value=''; })
+    .catch(()=>{ aviso.textContent = 'No se pudo enviar (revisa tu conexión) e inténtalo de nuevo.'; });
+}
+
+irA(0);
+</script>
+</body>
+</html>
