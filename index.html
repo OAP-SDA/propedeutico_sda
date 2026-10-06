@@ -188,6 +188,10 @@
   .org3 .lado{display:flex;align-items:center}
   .org3 .lado.izq{justify-self:stretch;justify-content:flex-end}.org3 .lado.der{justify-self:stretch;justify-content:flex-start}
   .org3 .lado .hl{flex:1;min-width:16px}
+  .org3 .t-izq{justify-self:stretch;height:22px;margin-left:50%;border-top:2px solid rgba(47,90,26,.5);border-left:2px solid rgba(47,90,26,.5)}
+  .org3 .t-der{justify-self:start;width:calc(50% + 1px);height:22px;border-top:2px solid rgba(47,90,26,.5);border-right:2px solid rgba(47,90,26,.5)}
+  .org3 .c1c{grid-column:1;justify-self:center;margin:0 10px}
+  .org3 .nodo small{display:block;font-size:12px;opacity:.75}
   .org3 .centro{display:flex;align-items:center;justify-self:stretch;align-self:stretch}.org3 .centro .esp,.org3 .centro .hl{flex:1}
   @media(max-width:700px){.org3 .nodo{padding:8px 10px;font-size:14px}}
   .semaforo{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}
@@ -197,7 +201,7 @@
   .pendiente p{font-size:15.5px;color:#5b4a1f}
   .chip-pend{display:inline-block;font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
         background:#b9892f;color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;margin-bottom:8px}
-  body.ocultar-pendientes .pendiente{display:none}
+  body.ocultar-pendientes .pendiente,body.ocultar-pendientes .termino.pend{display:none}
   .aviso-editor{background:#fdf8ea;border:1px solid #e3c98a;border-radius:10px;padding:12px 18px;margin-bottom:22px;font-family:var(--sans);font-size:13px;color:#5b4a1f}
   body.ocultar-pendientes .aviso-editor{display:none}
   .esencial{background:var(--verde);color:var(--crema);border-radius:12px;padding:20px 24px;margin-bottom:30px}
@@ -276,79 +280,85 @@
   </div>
   <div class="contenido">
     <h3 class="bloque">Canales de comunicación</h3>
-    <p class="lead">Esto es lo que dicen los módulos sobre cada canal:</p>
+    <div class="nota"><strong>Regla general:</strong> los asuntos (Operación) se trabajan por WhatsApp; los proyectos (OAP) se trabajan en Teamwork.</div>
     <table class="tabla">
       <tbody>
-      <tr><th style="width:22%">Canal</th><th>Para qué sirve, según el propedéutico</th><th style="width:16%">Dónde se ve</th></tr>
-      <tr><td><strong>Teamwork</strong></td><td>Plataforma central de proyectos y trabajo. Dentro de cada proyecto: <i>Mensajes</i> (comunicación interna del proyecto) y <i>Comentarios</i> (conversación ligada a cada tarea).</td><td><button class="ir-mod" onclick="irAId('m8')">Módulo 8</button></td></tr>
-      <tr><td><strong>Chat</strong></td><td>Canal interno para instrucciones y entregas del asunto.</td><td><button class="ir-mod" onclick="irAId('m5')">Módulo 5</button></td></tr>
-      <tr><td><strong>Grupos de cada asunto</strong></td><td>Destino de los informes del asunto, «de forma clara y ejecutiva». Por ahí también se envían los acuerdos de amparo que revisa el pasante.</td><td><button class="ir-mod" onclick="irAId('m3')">Módulos 3 y 6</button></td></tr>
-      <tr><td><strong>WhatsApp</strong></td><td>Mensajería rápida con clientes y equipo.</td><td><button class="ir-mod" onclick="irAId('m8')">Módulo 8</button></td></tr>
-      <tr><td><strong>Outlook</strong></td><td>Correo electrónico profesional del despacho.</td><td><button class="ir-mod" onclick="irAId('m8')">Módulo 8</button></td></tr>
-      <tr><td><strong>Calendar</strong></td><td>Agenda y citas del despacho.</td><td><button class="ir-mod" onclick="irAId('m8')">Módulo 8</button></td></tr>
-      <tr><td><strong>Claude</strong></td><td>Asistente de IA para redacción y análisis; la ortografía y redacción «podrá auxiliarse de la IA».</td><td><button class="ir-mod" onclick="irAId('m8')">Módulos 4 y 8</button></td></tr>
+      <tr><th style="width:24%">Canal</th><th>Para qué se usa</th></tr>
+      <tr><td><strong>WhatsApp</strong></td><td><b>Canal principal de Operación.</b> Por ahí llegan las instrucciones y se entregan los documentos de los asuntos, en el grupo que corresponda: grupos generales del despacho, grupos internos por asunto y grupos de comunicación con el cliente. Es también el canal con los clientes.</td></tr>
+      <tr><td><strong>Teamwork</strong></td><td><b>Canal principal de la OAP.</b> Ahí se asignan las instrucciones y se entregan los documentos de los proyectos. Dentro de cada proyecto están los <i>Mensajes</i> (comunicación interna del proyecto) y los <i>Comentarios</i> (conversación ligada a cada tarea).</td></tr>
+      <tr><td><strong>Google Drive</strong></td><td>En algunos casos se colabora en tiempo real abriendo Word directamente desde la aplicación de Google Drive, para evitar problemas de formato. La regla general en proyectos sigue siendo Teamwork.</td></tr>
+      <tr><td><strong>Google Calendar</strong></td><td>Agenda del despacho, incluida la agenda procesal: plazos, audiencias y vencimientos.</td></tr>
+      <tr><td><strong>Outlook</strong></td><td>Correo electrónico profesional del despacho.</td></tr>
+      <tr><td><strong>Claude</strong></td><td>Asistente de IA para redacción y análisis; la ortografía y redacción «podrá auxiliarse de la IA».</td></tr>
+      <tr><td><strong>Chat de revisión editorial</strong></td><td>Chat de WhatsApp donde se llevaba el proceso editorial del módulo 5. <b>Hoy está en desuso:</b> las labores editoriales se ven directamente con el Director Operativo.</td></tr>
       </tbody>
     </table>
-    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p>La regla de uso: qué va por cada canal (instrucciones, entregas, avisos a clientes, documentos, agenda) y cuál manda cuando dos se cruzan, por ejemplo, Chat frente a Mensajes de Teamwork, o WhatsApp frente a Outlook con clientes.</p></div>
 
     <h3 class="bloque">¿Con quién voy para…?</h3>
     <table class="tabla">
       <tbody>
-      <tr><th>Tema</th><th>A quién acudir</th><th>De dónde sale</th></tr>
-      <tr><td>Dudas sobre un asunto que te asignaron</td><td><strong>Tu abogado asignado</strong></td><td>«Abogados guían pasantes» (módulo 1) y cierre del taller.</td></tr>
-      <tr><td>Dudas generales o no sabes con quién ir</td><td><strong>El Coordinador del despacho</strong></td><td>Cierre del taller.</td></tr>
-      <tr><td>Apertura del expediente físico de un asunto</td><td><strong>Área de administración</strong></td><td>Flujo de la denuncia al expediente (módulo 6).</td></tr>
-      <tr><td>Llamadas, visitas, correspondencia y mantenimiento</td><td><strong>Personal administrativo</strong></td><td>Organigrama (módulo 1).</td></tr>
-      <tr><td>Proyectos del despacho y planeación anual</td><td><strong>Oficina de Administración de Proyectos (OAP)</strong></td><td>Módulos 1 y 7.</td></tr>
-      <tr><td>Quién redacta y revisa un documento</td><td><strong>Coordinador (proceso A) o abogado a cargo (procesos B y C)</strong></td><td>Proceso de revisión documental (módulo 5).</td></tr>
+      <tr><th>Tema</th><th style="width:42%">A quién acudir</th></tr>
+      <tr><td>Dudas sobre un asunto que te asignaron</td><td><strong>Tu abogado asignado</strong></td></tr>
+      <tr><td>Dudas generales o no sabes con quién ir</td><td><strong>Director Operativo</strong></td></tr>
+      <tr><td>Permisos y días de home office</td><td><strong>Director Operativo</strong></td></tr>
+      <tr><td>Nómina</td><td><strong>Director Operativo</strong></td></tr>
+      <tr><td>Urgencias fuera del horario</td><td><strong>Director Operativo</strong></td></tr>
+      <tr><td>Revisión editorial de un documento</td><td><strong>Director Operativo</strong></td></tr>
+      <tr><td>Quién redacta y revisa un documento</td><td><strong>Director Operativo (proceso A) o abogado a cargo (procesos B y C)</strong></td></tr>
+      <tr><td>Evaluaciones</td><td><strong>Director de la OAP</strong></td></tr>
+      <tr><td>Proyectos del despacho</td><td><strong>Director de la OAP</strong></td></tr>
+      <tr><td>Acceso a Teamwork y demás plataformas</td><td><strong>Equipo de Administración</strong></td></tr>
+      <tr><td>Material de oficina</td><td><strong>Equipo de Administración</strong></td></tr>
+      <tr><td>Apertura del expediente físico de un asunto</td><td><strong>Área de administración</strong></td></tr>
+      <tr><td>Llamadas, visitas, correspondencia y mantenimiento</td><td><strong>Personal administrativo</strong></td></tr>
       </tbody>
     </table>
-    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p>Completar y confirmar la tabla: permisos y días de home office, nómina y evaluaciones, acceso a Teamwork y demás plataformas, material de oficina, y a quién avisar ante una urgencia fuera del horario.</p></div>
 
     <h3 class="bloque">El recorrido de un asunto, de principio a fin</h3>
     <p class="lead">Cada paso ya está en algún módulo; aquí aparecen en orden para que veas cómo se conectan. Usa los botones para ir al detalle.</p>
     <div class="pasos">
-      <div class="paso"><div class="n"></div><div><h4>Recibes la instrucción</h4><p>Toma notas de cada instrucción; en los procesos B y C, el redactor confirma las instrucciones (por escrito en el B).</p><button class="ir-mod" onclick="irAId('m3')">Ver módulos 3 y 5</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Recibes la instrucción</h4><p>En los asuntos llega por WhatsApp, en el grupo del asunto; en los proyectos, por Teamwork. Toma notas de cada instrucción; en los procesos B y C, el redactor confirma las instrucciones (por escrito en el B).</p><button class="ir-mod" onclick="irAId('m3')">Ver módulos 3 y 5</button></div></div>
       <div class="paso"><div class="n"></div><div><h4>La tarea queda en Teamwork</h4><p>Cada tarea con responsable, fecha de vencimiento, estado y avance.</p><button class="ir-mod" onclick="irAId('m8')">Ver módulo 8</button></div></div>
-      <div class="paso"><div class="n"></div><div><h4>Revisas el expediente y la agenda</h4><p>Revisión exhaustiva del expediente; registro obligatorio de plazos, audiencias y vencimientos.</p><button class="ir-mod" onclick="irAId('m3')">Ver módulo 3</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Revisas el expediente y la agenda</h4><p>Revisión exhaustiva del expediente; registro obligatorio de plazos, audiencias y vencimientos en Google Calendar.</p><button class="ir-mod" onclick="irAId('m3')">Ver módulo 3</button></div></div>
       <div class="paso"><div class="n"></div><div><h4>Redactas con el formato del despacho</h4><p>Garamond 12, interlineado 1.5, justificado; reglas de negritas, cursivas y subrayado.</p><button class="ir-mod" onclick="irAId('m4')">Ver módulo 4</button></div></div>
       <div class="paso"><div class="n"></div><div><h4>Pasa por el proceso de revisión que le toca</h4><p>La clasificación del asunto determina si es proceso A, B o C.</p><button class="ir-mod" onclick="irAId('m5')">Ver módulo 5</button></div></div>
-      <div class="paso"><div class="n"></div><div><h4>Nombras y envías el documento</h4><p>Siempre en Word y PDF, con el nombre: iniciales, expediente, tipo, fecha y versión.</p><button class="ir-mod" onclick="irAId('m4')">Ver módulo 4</button></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Nombras y envías el documento</h4><p>Siempre en Word y PDF, con el nombre: iniciales, expediente, tipo, fecha y versión, en el grupo que corresponda.</p><button class="ir-mod" onclick="irAId('m4')">Ver módulo 4</button></div></div>
       <div class="paso"><div class="n"></div><div><h4>Presentas y obtienes la constancia</h4><p>Toda actuación ante el Ministerio Público genera una constancia: fotografía, escaneo, PDF y nombre.</p><button class="ir-mod" onclick="irAId('m6')">Ver módulo 6</button></div></div>
       <div class="paso"><div class="n"></div><div><h4>Integras el mismo día y registras en bitácora</h4><p>Al expediente interno; si hay copias nuevas de la carpeta, al expediente de copia íntegra.</p><button class="ir-mod" onclick="irAId('m6')">Ver módulo 6</button></div></div>
       <div class="paso"><div class="n"></div><div><h4>Registras tus horas</h4><p>Hoja de horas de Teamwork: facturable o no facturable por registro.</p><button class="ir-mod" onclick="irAId('m8')">Ver módulo 8</button></div></div>
       <div class="paso"><div class="n"></div><div><h4>Reportas avances</h4><p>Informes a los grupos de cada asunto, de forma clara y ejecutiva.</p><button class="ir-mod" onclick="irAId('m3')">Ver módulo 3</button></div></div>
     </div>
-    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p>Validar este recorrido. Se armó uniendo los módulos; confirmar el orden y añadir lo que falte (por ejemplo, en qué momento se informa al cliente y quién lo hace).</p></div>
 
     <h3 class="bloque">Glosario interno</h3>
     <p class="lead">Términos y siglas que aparecen en el propedéutico. Escribe para filtrar:</p>
     <input class="glosario-buscar" id="glosario-buscar" placeholder="Buscar un término…">
     <div class="glosario" id="glosario">
-      <div class="termino"><h4>OAP</h4><p>Oficina de Administración de Proyectos: planeación anual, seguimiento y mejora continua, desarrollo profesional y resultados.</p><small>Módulo 1</small></div>
-      <div class="termino"><h4>Coordinador</h4><p>El Coordinador del despacho: diseña planes, programas y proyectos anuales, designa responsables de proyectos y da acompañamiento continuo.</p><small>Módulos 1 y 5</small></div>
+      <div class="termino"><h4>OAP</h4><p>Oficina de Administración de Proyectos, a cargo del Director de la OAP: planeación anual, seguimiento y mejora continua, desarrollo profesional y resultados. Su canal principal es Teamwork.</p><small>Módulos 1 y 7</small></div>
+      <div class="termino"><h4>Director General</h4><p>El socio director del despacho.</p><small>Organigrama</small></div>
+      <div class="termino"><h4>Director Operativo</h4><p>Encabeza la Coordinación del despacho (Operación). En las presentaciones aparece como «Coordinador del despacho».</p><small>Organigrama</small></div>
+      <div class="termino"><h4>Director de la OAP</h4><p>Titular de la Oficina de Administración de Proyectos; depende directamente del Director General, al mismo nivel que el Director Operativo.</p><small>Organigrama</small></div>
+      <div class="termino"><h4>Coordinador</h4><p>En las presentaciones, «el Coordinador del despacho»: hoy, el Director Operativo. Diseña planes, programas y proyectos anuales, designa responsables y da acompañamiento continuo.</p><small>Módulos 1 y 5</small></div>
       <div class="termino"><h4>Abogado a cargo</h4><p>Define redactor, revisor y estructura de un documento en los procesos B y C.</p><small>Módulo 5</small></div>
       <div class="termino"><h4>Redactor</h4><p>Quien hace la primera versión de un documento.</p><small>Módulo 5</small></div>
       <div class="termino"><h4>Revisor</h4><p>Quien corrige estructura, contenido y estilo.</p><small>Módulo 5</small></div>
-      <div class="termino"><h4>Chat</h4><p>Canal interno para instrucciones y entregas del asunto.</p><small>Módulo 5</small></div>
+      <div class="termino"><h4>Chat</h4><p>Chat de WhatsApp para instrucciones y entregas del proceso editorial. Hoy está en desuso: las labores editoriales se ven directamente con el Director Operativo.</p><small>Módulo 5</small></div>
       <div class="termino"><h4>Proceso A, B y C</h4><p>Procesos de revisión documental: máxima, intermedia y mínima supervisión.</p><small>Módulo 5</small></div>
       <div class="termino"><h4>Revisión editorial</h4><p>Corrección lingüística final, revisión de formato, entrega de versión tentativamente final y generación de compare entre versiones.</p><small>Módulo 5</small></div>
-      <div class="termino pend"><h4>Compare</h4><p>Se genera «entre versiones» en la revisión editorial y sirve para evaluar la calidad y cantidad de cambios. Falta una definición formal.</p><small>Módulo 5 · <b>pendiente de definir</b></small></div>
+      <div class="termino"><h4>Compare</h4><p>Función de Word que muestra los cambios entre dos versiones de un documento, una más nueva que la otra. En la revisión editorial sirve para evaluar la calidad y cantidad de cambios.</p><small>Módulo 5</small></div>
       <div class="termino"><h4>Tipo A, B y C de proyecto</h4><p>Clasificación de los proyectos del despacho (coordinar, supervisar, monitorear). No confundir con los procesos A, B y C de revisión.</p><small>Módulo 7</small></div>
       <div class="termino"><h4>Desarrollo de Proyectos</h4><p>Documento estático con el portafolio permanente de proyectos del despacho.</p><small>Módulo 7</small></div>
       <div class="termino"><h4>Expediente interno</h4><p>Expediente que construye el despacho para dar seguimiento al asunto: documentos propios y constancias de nuestras gestiones.</p><small>Módulo 6</small></div>
       <div class="termino"><h4>Expediente de copia íntegra</h4><p>Copia exacta, completa e íntegra de la carpeta de investigación.</p><small>Módulo 6</small></div>
       <div class="termino"><h4>Constancia</h4><p>Lo que genera toda actuación ante el Ministerio Público (regla de oro).</p><small>Módulo 6</small></div>
-      <div class="termino pend"><h4>Bitácoras</h4><p>Las presentaciones mencionan la bitácora de seguimiento, la del asunto, la mensual y la interna de amparo. Falta aclarar si son la misma y dónde se lleva cada una.</p><small>Módulo 6 · <b>pendiente de definir</b></small></div>
+      <div class="termino pend"><h4>Bitácoras</h4><p>Son varias y se llevan en un archivo. Las presentaciones mencionan la bitácora de seguimiento, la del asunto, la mensual y la interna de amparo. Falta que Operación confirme el detalle de cada una.</p><small>Módulo 6 · <b>pendiente de definir</b></small></div>
       <div class="termino"><h4>Índice</h4><p>Guía de los documentos más importantes de la carpeta; se actualiza con cada nuevo documento.</p><small>Módulo 6</small></div>
       <div class="termino"><h4>MP</h4><p>Ministerio Público.</p><small>Módulos 3 y 6</small></div>
       <div class="termino"><h4>FGR / FGJCDMX</h4><p>Fiscalía General de la República / Fiscalía General de Justicia de la Ciudad de México.</p><small>Módulo 6</small></div>
       <div class="termino"><h4>CNPP</h4><p>Código Nacional de Procedimientos Penales.</p><small>Módulos 4 y 6</small></div>
       <div class="termino"><h4>MASC</h4><p>Mecanismos alternativos de solución de controversias.</p><small>Módulo 6</small></div>
-      <div class="termino pend"><h4>UGA</h4><p>Unidad de Gestión de Audiencias, según la presentación; ahí se solicita el registro de las audiencias. Falta confirmar el nombre oficial.</p><small>Módulo 6 · <b>pendiente de definir</b></small></div>
+      <div class="termino"><h4>UGA</h4><p>Unidad de Gestión Administrativa: ahí se solicita el registro (video, audio o acta) de las audiencias.</p><small>Módulo 6</small></div>
       <div class="termino"><h4>PJF / OAJ</h4><p>Poder Judicial de la Federación / Órgano de Administración Judicial: portales para dar seguimiento al amparo.</p><small>Módulo 6</small></div>
       <div class="termino pend"><h4>NVP y FI</h4><p>Siglas de determinaciones que debe reflejar el índice de la carpeta. Falta su significado.</p><small>Módulo 6 · <b>pendiente de definir</b></small></div>
-      <div class="termino pend"><h4>Sistema de Mejoración Continua</h4><p>Su operación corresponde a la Coordinación. Falta explicar qué es y cómo funciona.</p><small>Módulo 1 · <b>pendiente de definir</b></small></div>
       <div class="termino"><h4>Hoja de horas</h4><p>Función de Teamwork para registrar las horas dedicadas a cada tarea y proyecto.</p><small>Módulo 8</small></div>
     </div>
   </div>
@@ -377,20 +387,20 @@
     <h3 class="bloque">Organigrama interactivo</h3>
     <p class="lead">Haz clic en cada puesto para conocer sus funciones.</p>
     <div class="org3" aria-label="Organigrama de Schütte &amp; Delsol Abogados">
-      <div class="c2 nodo" data-org="socio">Socio/a director/a</div>
-      <div class="c2 vl"></div>
-      <div class="c1 lado izq"><div class="nodo" data-org="oap">Oficina de Administración de Proyectos</div><div class="hl"></div></div>
-      <div class="c2 centro"><div class="hl"></div><div class="vl" style="height:auto;align-self:stretch;flex:0 0 2px"></div><div class="hl"></div></div>
+      <div class="c2 nodo" data-org="socio">Director/a General<small>Socio/a director/a</small></div>
+      <div class="c2 centro"><div class="esp"></div><div class="vl" style="height:auto;align-self:stretch;flex:0 0 2px"></div><div class="hl"></div></div>
       <div class="c3 lado der"><div class="hl"></div><div class="nodo" data-org="admin">Personal de administración del despacho</div></div>
-      <div class="c2 vl"></div>
-      <div class="c2 nodo" data-org="coord">Coordinador/a del despacho</div>
+      <div class="t-izq"></div>
+      <div class="c2 t-der"></div>
+      <div class="c1c nodo" data-org="oap">Director/a de la OAP<small>Oficina de Administración de Proyectos</small></div>
+      <div class="c2 nodo" data-org="coord">Director/a Operativo/a<small>Coordinación del despacho</small></div>
       <div class="c2 vl"></div>
       <div class="c2 centro"><div class="esp"></div><div class="nodo" data-org="abogados">Abogada/os</div><div class="hl"></div></div>
       <div class="c3 lado der"><div class="hl"></div><div class="nodo" data-org="ofcounsel">Of counsel</div></div>
       <div class="c2 vl"></div>
       <div class="c2 nodo" data-org="pasantes">Pasantes</div>
     </div>
-    <p class="contador-check">La Oficina de Administración de Proyectos y el Personal de administración dependen del Socio/a director/a, al mismo nivel que la Coordinación.</p>
+    <p class="contador-check">La Dirección de la OAP y la Dirección Operativa dependen directamente de la Dirección General, al mismo nivel. El Personal de administración también depende de la Dirección General.</p>
     <div class="org-info" id="org-info">Selecciona un puesto del organigrama.</div>
 
     <h3 class="bloque">Comunicación interna</h3>
@@ -611,7 +621,7 @@
 
     <h3 class="bloque">Practica la nomenclatura de archivos</h3>
     <p class="lead">Todo documento se envía <strong>siempre en Word y PDF</strong>, y su nombre debe contener como mínimo: iniciales del cliente, expediente/carpeta/identificación, tipo de documento, fecha del documento y versión. Prueba el generador:</p>
-    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p><b>¿Por qué?</b> Una línea que explique para qué sirven la nomenclatura y el envío en Word y PDF (por ejemplo, qué problema evitan).</p></div>
+    <div class="nota"><strong>¿Por qué?</strong> La nomenclatura permite encontrar las versiones de un documento, saber cuál es la última y, a veces, quién lo redactó.</div>
     <div class="gen">
       <h4>Generador de nombre de archivo</h4>
       <div class="campos">
@@ -648,8 +658,8 @@
       <div class="card"><h4>Documento</h4><p>Cualquier escrito interno o externo.</p></div>
       <div class="card"><h4>Redactor</h4><p>Quien hace la primera versión.</p></div>
       <div class="card"><h4>Revisor</h4><p>Quien corrige estructura, contenido y estilo.</p></div>
-      <div class="card"><h4>Coordinador</h4><p>El Coordinador del despacho.</p></div>
-      <div class="card"><h4>Chat</h4><p>Canal interno para instrucciones y entregas del asunto.</p></div>
+      <div class="card"><h4>Coordinador</h4><p>El Coordinador del despacho (hoy, Director Operativo).</p></div>
+      <div class="card"><h4>Chat</h4><p>Canal interno para instrucciones y entregas del asunto. Hoy en desuso: las labores editoriales se ven directamente con el Director Operativo.</p></div>
     </div>
 
     <h3 class="bloque">Elementos a revisar</h3>
@@ -887,7 +897,7 @@
     <h3 class="bloque">Audiencias: solicitud a la UGA</h3>
     <div class="pasos">
       <div class="paso"><div class="n"></div><div><h4>Identificar si hubo audiencia en el proceso</h4><p>Audiencia de solicitud de orden de aprehensión, inicial, intermedia, de juicio oral, lectura y explicación de sentencia, modificación de medidas cautelares, o cualquier vista ante el Juez de Control.</p></div></div>
-      <div class="paso"><div class="n"></div><div><h4>Solicitar el registro a la Unidad de Gestión de Audiencias (UGA)</h4><p>Presentar solicitud formal ante la UGA del tribunal correspondiente para obtener el registro (video, audio o acta) de la audiencia celebrada.</p></div></div>
+      <div class="paso"><div class="n"></div><div><h4>Solicitar el registro a la Unidad de Gestión Administrativa (UGA)</h4><p>Presentar solicitud formal ante la UGA del tribunal correspondiente para obtener el registro (video, audio o acta) de la audiencia celebrada.</p></div></div>
       <div class="paso"><div class="n"></div><div><h4>Integrar al expediente físico o electrónico</h4><p>Si es carpeta de investigación o judicial: agregar el acuse de la solicitud y la copia del registro al expediente físico. Si es amparo: guardar en el expediente electrónico.</p></div></div>
       <div class="paso"><div class="n"></div><div><h4>Registrar en la bitácora</h4><p>Anotar en la bitácora mensual: fecha de la audiencia, tipo, resultado y número de registro obtenido de la UGA. Indicar si está pendiente de obtener.</p></div></div>
     </div>
@@ -946,7 +956,7 @@
     <div class="nota"><strong>Portales:</strong> Portal de Servicios en Línea del PJF (<i>serviciosenlinea.pjf.gob.mx/juicioenlinea</i>) y servicios del OAJ (<i>oaj.gob.mx</i>).</div>
 
     <h3 class="bloque">Reglas generales: lo que debes recordar</h3>
-    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: Coordinación</span><p><b>¿Por qué?</b> Una línea que explique la razón de la integración el mismo día y de los dos expedientes, para que se entienda el sentido de la regla y no sólo la regla.</p></div>
+    <div class="nota"><strong>¿Por qué integrar el mismo día?</strong> Las constancias que no se integran a tiempo se pierden, y después es imposible reconstruir la trazabilidad del asunto.</div>
     <div class="cards">
       <div class="card"><div class="icono">📄</div><h4>Documentos originales</h4><p>Nunca perforar los documentos originales del cliente. Siempre colocarlos en protectores de hojas dentro del expediente.</p></div>
       <div class="card"><div class="icono">✍️</div><h4>Firmas de clientes</h4><p>Las firmas del cliente deben ser resguardadas por el abogado asignado. No quedan en el área común del despacho.</p></div>
@@ -975,21 +985,38 @@
     <h3 class="bloque">Tres preguntas para entender los proyectos</h3>
     <details class="acordeon" open><summary>1. ¿Para qué existen los proyectos?</summary><div class="cuerpo">
       <p><strong>Lo que dice el propedéutico:</strong> todo lo que no es litigio tiende a ser proyecto. Los proyectos forman un portafolio permanente, que no cambia ni se cierra anualmente, hasta en tanto no cambien los designios de Dirección. La OAP se encarga de la planeación anual, el seguimiento y la mejora continua, el desarrollo profesional y los resultados.</p>
-      <div class="pendiente"><span class="chip-pend">Pendiente · lo define: OAP</span><p>Explicar el objetivo de los proyectos: qué busca el despacho con ellos y cómo se relacionan con la visión de «trascender el ejercicio profesional de la abogacía para transformar la realidad social».</p></div>
+      <p style="margin-top:10px"><strong>Para qué sirven:</strong> el despacho busca incidir más allá del litigio. Los proyectos son su principal instrumento para la transformación de la realidad social que plantea la visión.</p>
     </div></details>
     <details class="acordeon"><summary>2. ¿Cómo participo en un proyecto?</summary><div class="cuerpo">
       <p><strong>Lo que dice el propedéutico:</strong> cada proyecto empieza con el nombramiento de una coordinación y de un equipo. Las tareas viven en Teamwork, con responsable, fecha de vencimiento, estado y avance, y las horas se registran en la hoja de horas. En los proyectos tipo C, los avances se revisan en juntas.</p>
-      <div class="pendiente"><span class="chip-pend">Pendiente · lo define: OAP</span><p>Explicar cómo se asigna a una persona a un proyecto, cuánto tiempo se espera que le dedique frente al trabajo de litigio, con qué periodicidad hay juntas y cómo cuenta su participación en las evaluaciones trimestrales.</p></div>
+      <ul class="lista">
+        <li><strong>Asignación:</strong> el Director de la OAP propone quién participa y el Director Operativo lo aprueba; en casos especiales, aprueba el Director General.</li>
+        <li><strong>Prioridad:</strong> el litigio siempre es prioritario. La estructura de proyectos es una <i>matriz débil</i> (en términos de la guía PMBOK): cada persona conserva su trabajo y su línea de mando en Operación, y quien coordina un proyecto tiene una autoridad limitada sobre su tiempo.</li>
+        <li><strong>Juntas:</strong> semanales; por ahora, los lunes a las 13:30.</li>
+        <li><strong>Evaluación:</strong> la participación y el trabajo en proyectos cuentan en las evaluaciones trimestrales.</li>
+      </ul>
     </div></details>
     <details class="acordeon"><summary>3. ¿Qué significan los tipos A, B y C?</summary><div class="cuerpo">
       <p><strong>Lo que dice el propedéutico:</strong> tipo A, <i>coordinar</i> (administrador principal de tareas, responsables y vencimientos); tipo B, <i>supervisar</i> (revisar y corregir entregables de alta calidad); tipo C, <i>monitorear</i> (revisión de avances en juntas, impulso y seguimiento continuo).</p>
       <div class="nota"><strong>No confundir</strong> con los procesos A, B y C de revisión documental del módulo 5: son clasificaciones distintas.</div>
-      <div class="pendiente"><span class="chip-pend">Pendiente · lo define: OAP</span><p>Confirmar quién coordina, supervisa o monitorea en cada tipo (¿la OAP?) y qué cambia para quien participa en un proyecto A, B o C.</p></div>
+      <table class="tabla">
+        <tbody>
+        <tr><th style="width:18%">Tipo</th><th>Quién coordina</th><th>Papel del titular de la OAP</th></tr>
+        <tr><td><strong>A</strong></td><td>El titular de la OAP, directamente.</td><td>Coordina.</td></tr>
+        <tr><td><strong>B</strong></td><td>Otra persona.</td><td>Supervisa.</td></tr>
+        <tr><td><strong>C</strong></td><td>Otra persona.</td><td>Sólo monitorea, en las juntas de proyectos.</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px">Lo que cambia es la intervención directa del titular de la OAP: mientras más cerca del tipo C, más responsabilidad directa tiene quien coordina el proyecto.</p>
     </div></details>
 
-    <h3 class="bloque">Un ejemplo: el propedéutico es un proyecto</h3>
-    <p class="lead">Según el portafolio de Desarrollo de Proyectos, el propedéutico que estás tomando es un <strong>proyecto tipo B</strong>.</p>
-    <div class="pendiente"><span class="chip-pend">Pendiente · lo define: OAP</span><p>Describir el proyecto del propedéutico como caso práctico: quién lo coordina, quién integra el equipo, sus objetivos, sus entregables (presentaciones, esta aplicación, cuestionario) y su calendario.</p></div>
+    <h3 class="bloque">Un ejemplo: el propedéutico fue un proyecto</h3>
+    <p class="lead">En el portafolio de Desarrollo de Proyectos, el propedéutico que estás tomando aparece como <strong>proyecto tipo B</strong>: lo coordinó un integrante que ya no forma parte del despacho, con la supervisión del titular de la OAP; hoy lo coordina de manera interina el propio titular.</p>
+    <div class="cards">
+      <div class="card"><span class="chip">Objetivo</span><p>Generar un curso introductorio a SDA que redujera el tiempo de adaptación y las barreras de entrada de las personas que se integran al despacho.</p></div>
+      <div class="card"><span class="chip">Entregables</span><p>Las presentaciones, las reglas internas y esta aplicación.</p></div>
+      <div class="card"><span class="chip">Cierre</span><p>Con la entrega de esta aplicación terminó su etapa como proyecto. Desde ahora, el propedéutico es una operación recurrente.</p></div>
+    </div>
 
     <h3 class="bloque">Funciones de la gestión de proyectos</h3>
     <div class="cards">
@@ -1060,8 +1087,8 @@
 
     <h3 class="bloque">Las cinco herramientas</h3>
     <div class="cards">
-      <div class="card"><div class="icono">🗂️</div><h4>Teamwork</h4><p>Plataforma central de proyectos y trabajo.</p></div>
-      <div class="card"><div class="icono">💬</div><h4>WhatsApp</h4><p>Mensajería rápida con clientes y equipo.</p></div>
+      <div class="card"><div class="icono">🗂️</div><h4>Teamwork</h4><p>Plataforma central de proyectos y trabajo. Canal principal de la OAP.</p></div>
+      <div class="card"><div class="icono">💬</div><h4>WhatsApp</h4><p>Mensajería rápida con clientes y equipo. Canal principal de Operación.</p></div>
       <div class="card"><div class="icono">📅</div><h4>Calendar</h4><p>Agenda y citas del despacho.</p></div>
       <div class="card"><div class="icono">✳️</div><h4>Claude</h4><p>Asistente de IA para redacción y análisis.</p></div>
       <div class="card"><div class="icono">✉️</div><h4>Outlook</h4><p>Correo electrónico profesional del despacho.</p></div>
@@ -1126,7 +1153,7 @@
       <button class="tab-btn" style="margin-top:12px;border-color:var(--dorado);color:var(--dorado-suave)" onclick="enviarComentario()">Enviar comentario</button>
       <div class="expl" id="comentario-aviso"></div>
     </div>
-    <div class="nota" style="margin-top:30px"><strong>¡Gracias!</strong> Con esto concluye el taller propedéutico. Ante cualquier duda, acude a tu abogado asignado o al Coordinador del despacho.</div>
+    <div class="nota" style="margin-top:30px"><strong>¡Gracias!</strong> Con esto concluye el taller propedéutico. Ante cualquier duda, acude a tu abogado asignado o al Director Operativo.</div>
   </div>
   <div class="pie-nav">
     <button onclick="irA(9)">← Plataformas de la firma</button>
@@ -1153,7 +1180,7 @@ const SECCIONES = [
 ];
 const visitadas = new Set();
 /* Cambia a false para ocultar los recuadros «Pendiente» antes de publicar para pasantes. */
-const MOSTRAR_PENDIENTES = true;
+const MOSTRAR_PENDIENTES = false;
 let actual = 0;
 
 function irA(i){
@@ -1188,13 +1215,13 @@ document.getElementById('indice-inicio').innerHTML = SECCIONES.slice(1,SECCIONES
 
 /* ---- organigrama ---- */
 const ORG = {
-  socio:'<strong>Socio director:</strong> dirigir al despacho al cumplimiento de misión, visión, valores y objetivos estratégicos, captación de clientes y representación institucional. Diseñar implementación de estrategias, aprobar planes de la OAP, entre otros.',
-  coord:'<strong>Coordinador de SDA:</strong> diseñar planes, programas y proyectos anuales, designar responsables de proyectos, dar acompañamiento continuo, asegurar la operación del Sistema de Mejoración Continua, entre otros.',
+  socio:'<strong>Director General (socio director):</strong> dirigir al despacho al cumplimiento de misión, visión, valores y objetivos estratégicos, captación de clientes y representación institucional. Diseñar implementación de estrategias, aprobar planes de la OAP, entre otros.',
+  coord:'<strong>Director Operativo (Coordinación del despacho):</strong> diseñar planes, programas y proyectos anuales, designar responsables de proyectos, dar acompañamiento continuo, entre otros. Aprueba la asignación de personas a proyectos y atiende permisos, home office, nómina y urgencias fuera del horario.',
   abogados:'<strong>Abogados:</strong> diseñar, implementar y supervisar estrategias jurídicas, atender clientes, redactar documentos, revisar los asuntos asignados, entre otros.',
   pasantes:'<strong>Pasantes:</strong> responsabilidad en los asuntos asignados, atender consultas de clientes o potenciales clientes, informar eventualidades e incidencias, seguimiento de los asuntos, entre otros.',
   ofcounsel:'<strong>Of counsel:</strong> prestar apoyo estratégico al despacho en carácter consultivo, emitir opiniones sobre escritos, legislación, estrategias o documentos relevantes, entre otros.',
   admin:'<strong>Personal administrativo:</strong> llevar la gestión administrativa material, financiera, contable, de recursos humanos, coordinar mantenimiento, recibir llamadas, visitas, correspondencia, entre otros.',
-  oap:'<strong>Oficina de Administración de Proyectos (OAP):</strong> planeación anual, seguimiento y mejora continua, desarrollo profesional y resultados.'
+  oap:'<strong>Director de la OAP (Oficina de Administración de Proyectos):</strong> planeación anual, seguimiento y mejora continua, desarrollo profesional y resultados. Propone la asignación de personas a proyectos, coordina, supervisa o monitorea los proyectos según su tipo y atiende las evaluaciones.'
 };
 document.querySelectorAll('.nodo').forEach(n=>{
   n.onclick = ()=>{
@@ -1310,7 +1337,7 @@ const PREGUNTAS = [
   ops:['Derecho corporativo','Litigio penal estratégico','Derecho familiar'], ok:1,
   fb:'Litigio penal estratégico, con representación integral desde la investigación inicial hasta los juicios orales y los medios de impugnación.'},
  {q:'¿Qué debe hacerse con cada instrucción que recibes?',
-  ops:['Tomar notas','Esperar a que la repitan por escrito','Reenviarla al Coordinador'], ok:0,
+  ops:['Tomar notas','Esperar a que la repitan por escrito','Reenviarla al Director Operativo'], ok:0,
   fb:'Una de las expectativas del despacho es tomar notas de cada instrucción, además de reportar avances y proponer alternativas.'},
  {q:'Después de una audiencia, la buena práctica es…',
   ops:['Esperar la siguiente junta para informar','Registrarla en minuta interna y comunicarla de inmediato al cliente y/o socio responsable','Sólo guardar el acta en el expediente'], ok:1,
@@ -1320,10 +1347,10 @@ const PREGUNTAS = [
   fb:'Todo lo que no es litigio tiende a ser proyecto.'},
  {q:'¿Qué tipo de proyecto es el propedéutico?',
   ops:['Tipo A','Tipo B','Tipo C'], ok:1,
-  fb:'En el portafolio de Desarrollo de Proyectos, el propedéutico aparece como proyecto tipo B.'},
- {q:'¿Qué canal define el proceso de revisión como canal interno para instrucciones y entregas del asunto?',
-  ops:['El Chat','Outlook','Calendar'], ok:0,
-  fb:'El glosario del proceso de revisión documental define el Chat como canal interno para instrucciones y entregas del asunto.'},
+  fb:'En el portafolio de Desarrollo de Proyectos, el propedéutico aparece como proyecto tipo B: otra persona coordinaba y el titular de la OAP supervisaba. Hoy ya es una operación recurrente.'},
+ {q:'¿Cuál es el canal principal de Operación, por donde llegan las instrucciones y se entregan los documentos de los asuntos?',
+  ops:['WhatsApp, en el grupo que corresponda','Outlook','Teamwork'], ok:0,
+  fb:'WhatsApp es el canal principal de Operación (grupos generales, grupos internos por asunto y grupos con el cliente). Teamwork es el canal principal de la OAP, para los proyectos.'},
  {q:'¿Quién genera el expediente físico interno cuando se presenta una denuncia?',
   ops:['El pasante que la presentó','El área de administración','El Coordinador'], ok:1,
   fb:'El acuse y sus anexos se entregan al área de administración, que genera el expediente físico y lo entrega a pasantes para incorporarlo al archivo.'},
